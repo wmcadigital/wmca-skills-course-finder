@@ -1,28 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import AppLayout from '../../layout/index';
+import GetAllCourses from '../../services/apiCoursesService'
 
 
-const itemsPerPage = 3;
-const totalItems = 30;
-const totalPages = Math.ceil(totalItems / itemsPerPage);
-
+const itemsPerPage = 10;
 const maxIndexButtons = 5;
 
 const Page = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const initialPage = parseInt(searchParams.get('page'), 10) || 1;
-
   const [currentPage, setCurrentPage] = useState(initialPage);
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [courses, setCourses] = useState([]);
+
   useEffect(() => {
-    // Update the URL when the page changes
+    // Update the URL when the page or search term changes
     const newSearchParams = new URLSearchParams();
     newSearchParams.set('page', currentPage);
+    newSearchParams.set('search', searchTerm);
     // Use replaceState to prevent adding a new entry to the history stack
     window.history.replaceState({}, '', `?${newSearchParams.toString()}`);
-  }, [currentPage]);
+  }, [currentPage, searchTerm]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await GetAllCourses();
+        setCourses(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []); // The empty dependency array means this effect runs once after the initial render
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
@@ -36,12 +50,18 @@ const Page = () => {
     setCurrentPage(page);
   };
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Reset to the first page when the search term changes
+  };
+
   const generatePageIndexButtons = () => {
     const buttons = [];
+    const totalPagesForcourses = Math.ceil(courses.length / itemsPerPage);
     const halfMaxButtons = Math.floor(maxIndexButtons / 2);
 
     let startPage = Math.max(currentPage - halfMaxButtons, 1);
-    let endPage = Math.min(startPage + maxIndexButtons - 1, totalPages);
+    let endPage = Math.min(startPage + maxIndexButtons - 1, totalPagesForcourses);
 
     if (endPage - startPage < maxIndexButtons - 1) {
       startPage = Math.max(endPage - maxIndexButtons + 1, 1);
@@ -63,7 +83,7 @@ const Page = () => {
       );
     }
 
-    if (endPage < totalPages) {
+    if (endPage < totalPagesForcourses) {
       buttons.push(
         <button key="nextDots" disabled>
           ...
@@ -75,15 +95,19 @@ const Page = () => {
   };
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-  const currentItems = Array.from({ length: endIndex - startIndex }, (_, index) => `Item ${startIndex + index + 1}`);
+  const endIndex = Math.min(startIndex + itemsPerPage, courses.length);
+  const currentItems = courses.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(courses.length / itemsPerPage);
 
   return (
     <div>
       <div>
+        <input type="text" placeholder="Search" value={searchTerm} onChange={handleSearchChange} />
         {currentItems.map((item, index) => (
-          <div key={index}>{item}</div>
-        ))}
+          <div>
+            <div key={index}>{item.CourseDescription}</div>
+          </div>
+        ))} 
       </div>
       <div>
         <button onClick={handlePrevPage} disabled={currentPage === 1}>

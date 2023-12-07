@@ -1,19 +1,35 @@
 import React from 'react';
+import { Link} from 'react-router-dom';
 
-const Breadcrumbs = () => {
+const Breadcrumbs = ({ breadCrumb }) => {
+  
+  const generateBreadcrumbLinks = () => {
+    return breadCrumb.map((segment, index) => {
+      return (
+        <li key={index} className="wmcads-breadcrumb__list-item">
+          {segment.path === undefined ? (
+            <span className="wmcads-breadcrumb__link wmcads-breadcrumb__link--current" aria-current="page">
+              {segment.name}
+            </span>
+          ) : (
+            <Link to={segment.path} className="wmcads-breadcrumb__link">
+              {segment.name}
+            </Link>
+          )}
+        </li>
+      );
+    });
+  };
+
   return (
     <nav aria-label="Breadcrumbs" className="wmcads-breadcrumb">
       <ol className="wmcads-breadcrumb__list">
         <li className="wmcads-breadcrumb__list-item">
-          <a href="/" className="wmcads-breadcrumb__link">
+          <Link to="/" className="wmcads-breadcrumb__link">
             Home
-          </a>
+          </Link>
         </li>
-        <li className="wmcads-breadcrumb__list-item">
-          <a href="/components" className="wmcads-breadcrumb__link wmcads-breadcrumb__link--current" aria-current="page">
-            Components
-          </a>
-        </li>
+        {generateBreadcrumbLinks()}
       </ol>
     </nav>
   );

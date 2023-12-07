@@ -17,7 +17,7 @@ const Header = () => {
             />
           </a>
         </div>
-        <h1 className="wmcads-header__title wmcads-col-1 wmcads-col-sm-auto">%REACT_APP_TITLE%</h1>
+        <h1 className="wmcads-header__title wmcads-col-1 wmcads-col-sm-auto"></h1>
       </div>
     </header>
   );
