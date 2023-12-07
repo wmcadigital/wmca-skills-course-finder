@@ -291,11 +291,10 @@ const Page = () => {
             <div className="load-wrapper-main">
               {contentLoad}
             </div>
-          ) : (
+          ) : currentCourseItems.length > 0 ? (
             currentCourseItems.map((course, index) => (
               <div key={index} className="wmcads-search-result">
                 <h2 className="wmcads-m-b-none">
-                  
                   <Link to={`/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`} className="h2 wmcads-search-result__title">
                     {course.CourseName}
                   </Link>
@@ -308,20 +307,43 @@ const Page = () => {
                 <p className="wmcads-search-result__excerpt">
                   {createExcerpt(course.CourseDescription, 200)}
                 </p>
-                <table class="courses wmcads-table wmcads-m-b-xl wmcads-table--without-header">
+                <table className="courses wmcads-table wmcads-m-b-xl wmcads-table--without-header">
                   <tbody>
                     <tr>
-                      <td class="" data-header="Header 2"><strong>Start date: </strong>{isFlexible(course)}</td>
-                      <td class="" data-header="Header 2"><strong>Course type: </strong>{course.DeliverModeType}</td>
+                      <td className="" data-header="Header 2"><strong>Start date: </strong>{isFlexible(course)}</td>
+                      <td className="" data-header="Header 2"><strong>Course type: </strong>{course.DeliverModeType}</td>
                     </tr>
                     <tr>
-                      <td class="" data-header="Header 2"><strong>Cost: </strong>{course.Cost === null ? 'N/A' : course.Cost }</td>
-                      <td class="" data-header="Header 2"><strong>Duration: </strong>{corsesDuration(course)}</td>
+                      <td className="" data-header="Header 2"><strong>Cost: </strong>{course.Cost === null ? 'N/A' : course.Cost}</td>
+                      <td className="" data-header="Header 2"><strong>Duration: </strong>{corsesDuration(course)}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             ))
+          ) : (
+            <div className="wmcads-msg-summary wmcads-msg-summary--warning" style={{marginTop: '40px'}}>
+              <div className="wmcads-msg-summary__header">
+                <svg className="wmcads-msg-summary__icon">
+                  <use
+                    xlinkHref="#wmcads-general-warning-circle"
+                    href="#wmcads-general-warning-circle"
+                  ></use>
+                </svg>
+                <h3 className="wmcads-msg-summary__title">
+                  There are no matching results
+                </h3>
+              </div>
+              <div className="wmcads-msg-summary__info">
+                <p>Improve your search results by:</p>
+                <ul className="wmcads-unordered-list">
+                  <li>Removing filters</li>
+                  <li>Double-checking your spelling</li>
+                  <li>Using fewer keywords</li>
+                  <li>Searching for something less specific</li>
+                </ul>
+              </div>
+            </div>
           )
         }
       </div>
@@ -368,8 +390,6 @@ const Page = () => {
             </div>
             {CoursesFound(currentCourseItems)}
             <div className="wmcads-pagination wmcads-m-t-xl">
-
-
               {currentPage > 1 && (
                 <a
                   href="#"
@@ -393,12 +413,14 @@ const Page = () => {
               <ol className="wmcads-pagination__nav">
                 {generatePageIndexPagination()}
               </ol>
-              <a onClick={handleNextPage} href="#" target="_self" class="wmcads-pagination__next wmcads-link wmcads-link--with-chevron">
-                Next page
-                <svg class="wmcads-link__chevron wmcads-link__chevron--right">
-                  <use href="#wmcads-general-chevron-right" href="#wmcads-general-chevron-right"></use>
-                </svg>
-              </a>
+              { coursesCount > 0 && !loading &&
+                <a onClick={handleNextPage} href="#" target="_self" class="wmcads-pagination__next wmcads-link wmcads-link--with-chevron">
+                  Next page
+                  <svg class="wmcads-link__chevron wmcads-link__chevron--right">
+                    <use href="#wmcads-general-chevron-right" href="#wmcads-general-chevron-right"></use>
+                  </svg>
+                </a>
+              }
             </div>
           </div>
           <aside class="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
