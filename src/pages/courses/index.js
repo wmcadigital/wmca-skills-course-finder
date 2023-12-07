@@ -159,10 +159,12 @@ const Page = () => {
 
     if (coursesCount > 1) {
       return (<p class="course-count">Showing 1 to {currentCourseItems.length} of <strong>{coursesCount}</strong> courses</p>)
-    // return (<p class="load-block"></p>)
+      // return (<p class="load-block"></p>)
     } else if (coursesCount === 1) {
-    } else {
+    } else if (loading) {
       return (<p class="load-block pulse"></p>)
+    } else if (coursesCount === 0) {
+      return (<p class="course-count"><strong>{coursesCount}</strong> results found</p>)
     }
 
   }
