@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import AppLayout from '../../layout/index';
-import GetAllCourses from '../../services/apiCoursesService'
+import apiCoursesService from '../../services/apiCoursesService';
 
 
 const itemsPerPage = 10;
@@ -28,7 +28,7 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await GetAllCourses();
+        const data = await apiCoursesService.getData();
         setCourses(data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -57,11 +57,11 @@ const Page = () => {
 
   const generatePageIndexButtons = () => {
     const buttons = [];
-    const totalPagesForcourses = Math.ceil(courses.length / itemsPerPage);
+    const totalPagesForCourses = Math.ceil(courses.length / itemsPerPage);
     const halfMaxButtons = Math.floor(maxIndexButtons / 2);
 
     let startPage = Math.max(currentPage - halfMaxButtons, 1);
-    let endPage = Math.min(startPage + maxIndexButtons - 1, totalPagesForcourses);
+    let endPage = Math.min(startPage + maxIndexButtons - 1, totalPagesForCourses);
 
     if (endPage - startPage < maxIndexButtons - 1) {
       startPage = Math.max(endPage - maxIndexButtons + 1, 1);
@@ -69,10 +69,18 @@ const Page = () => {
 
     if (startPage > 1) {
       buttons.push(
-        <button key="prevDots" disabled>
-          ...
+        <button key={1} onClick={() => handleJumpToPage(1)} disabled={1 === currentPage}>
+          1
         </button>
       );
+
+      if (startPage > 2) {
+        buttons.push(
+          <button key="prevDots" disabled>
+            ...
+          </button>
+        );
+      }
     }
 
     for (let i = startPage; i <= endPage; i++) {
@@ -83,16 +91,26 @@ const Page = () => {
       );
     }
 
-    if (endPage < totalPagesForcourses) {
+    if (endPage < totalPagesForCourses) {
+      if (endPage < totalPagesForCourses - 1) {
+        buttons.push(
+          <button key="nextDots" disabled>
+            ...
+          </button>
+        );
+      }
+
       buttons.push(
-        <button key="nextDots" disabled>
-          ...
+        <button key={totalPagesForCourses} onClick={() => handleJumpToPage(totalPagesForCourses)} disabled={totalPagesForCourses === currentPage}>
+          {totalPagesForCourses}
         </button>
       );
     }
 
     return buttons;
   };
+
+
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, courses.length);
@@ -103,9 +121,11 @@ const Page = () => {
     <div>
       <div>
         <input type="text" placeholder="Search" value={searchTerm} onChange={handleSearchChange} />
+        {console.log(currentItems, 'lists in view')}
         {currentItems.map((item, index) => (
           <div>
             <div key={index}>{item.CourseDescription}</div>
+            <p>-------------------------------------------</p>
           </div>
         ))} 
       </div>
@@ -124,7 +144,13 @@ const Page = () => {
 
 
 const Pag = () => {
-  const WrappedComponent = AppLayout(Page);
+
+  const breadCrumb = [
+    {
+      name: 'Course Finder',
+    }
+  ]
+  const WrappedComponent = AppLayout(Page, { breadCrumb });
   return <WrappedComponent />;
 };
 

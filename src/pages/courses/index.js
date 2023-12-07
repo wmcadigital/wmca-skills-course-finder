@@ -218,15 +218,29 @@ const Page = () => {
 
     if (startPage > 1) {
       Li.push(
-        <li key="prevDots" className="wmcads-pagination__item">
-          ...
+        <li key={1} className="wmcads-pagination__item">
+          {1 === currentPage ? (
+            1
+          ) : (
+            <a onClick={(e) => handleJumpToPage(e, 1)} className="wmcads-link" href="#">
+              1
+            </a>
+          )}
         </li>
       );
+
+      if (startPage > 2) {
+        Li.push(
+          <li key="prevDots" className="wmcads-pagination__item">
+            ...
+          </li>
+        );
+      }
     }
 
     for (let i = startPage; i <= endPage; i++) {
       Li.push(
-        <li key={i} className={i === currentPage ? "wmcads-pagination__item" : "wmcads-pagination__item"}>
+        <li key={i} className={"wmcads-pagination__item"}>
           {i === currentPage ? (
             i
           ) : (
@@ -239,9 +253,23 @@ const Page = () => {
     }
 
     if (endPage < totalPagesForcourses) {
+      if (endPage < totalPagesForcourses - 1) {
+        Li.push(
+          <li key="nextDots" className="wmcads-pagination__item">
+            ...
+          </li>
+        );
+      }
+
       Li.push(
-        <li key="nextDots" className="wmcads-pagination__item">
-          ...
+        <li key={totalPagesForcourses} className={totalPagesForcourses === currentPage ? "wmcads-pagination__item" : "wmcads-pagination__item"}>
+          {totalPagesForcourses === currentPage ? (
+            totalPagesForcourses
+          ) : (
+              <a onClick={(e) => handleJumpToPage(e, totalPagesForcourses)} className="wmcads-link" href="#">
+                {totalPagesForcourses}
+            </a>
+          )}
         </li>
       );
     }
