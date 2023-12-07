@@ -20,6 +20,47 @@ const filterCourses = (courses, studyModes, filterType) => {
   return courses.filter(course => studyModes.includes(course[filterType]));
 };
 
+const sortCourses = (courses) => {
+
+  const sortCourses = [...courses].sort((a, b) => {
+    const dateA = a.StartDate ? new Date(a.StartDate) : null;
+    const dateB = b.StartDate ? new Date(b.StartDate) : null;
+
+    // Handle null dates by placing them at the end
+    if (dateA === null && dateB === null) {
+      return 0;
+    } else if (dateA === null) {
+      return 1;
+    } else if (dateB === null) {
+      return -1;
+    } else {
+      return dateA - dateB;
+    }
+  });
+
+  return sortCourses
+}
+
+
+const filterCoursesByStartDate = (courses, startBy) => {
+  return courses.filter(course => {
+    const targetDate = moment(course.StartDate);
+    const currentDate = moment();
+    const monthDifference = targetDate.diff(currentDate, 'months');
+
+    switch (startBy) {
+      case 'New 3 months':
+        return (monthDifference === 3) && courses
+        case 'In 3 to 6 months':
+        return (monthDifference > 3 && monthDifference <= 6) && courses
+        case 'More than 6 months':
+        return (monthDifference > 6) && courses
+      default:
+      // Handle other cases or set a default value
+    }
+  })
+}
+
 const Page = () => {
   const [courses, setCourses] = useState([]);
   const [getCourses, setGetCourses] = useState([]);
@@ -54,8 +95,10 @@ const Page = () => {
   const initialPage = parseInt(searchParams.get('page'), 10) || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [loading, setLoading] = useState(false);
+  const [filterIsModified, setFilterIsModified] = useState(false);
   
   const [filter, setFilter] = useState({
+    startDate: "",
     sort: "",
     courseType: [],
     courseHours: [],
@@ -63,8 +106,14 @@ const Page = () => {
     searchTerm: ''
   });
 
-
-
+  const initialFilter = {
+    startDate: "",
+    sort: "",
+    courseType: [],
+    courseHours: [],
+    courseStudyTime: [],
+    searchTerm: ''
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,12 +140,17 @@ const Page = () => {
     newSearchParams.set('courseType', filter.courseType);
     newSearchParams.set('courseHours', filter.courseHours);
     newSearchParams.set('courseStudyTime', filter.courseStudyTime);
+    newSearchParams.set('startDate', filter.startDate);
 
     // Use replaceState to prevent adding a new entry to the history stack
     window.history.replaceState({}, '', `?${newSearchParams.toString()}`);
   }, [currentPage, filter]);
 
   useEffect(() => {
+
+    const hasFilterSetted = JSON.stringify(filter) !== JSON.stringify(initialFilter)
+
+    setFilterIsModified(hasFilterSetted)
 
     let coursesFiltered = getCourses;
     
@@ -120,11 +174,28 @@ const Page = () => {
       coursesFiltered = filterCourses(coursesFiltered, filter.courseStudyTime, 'AttendancePatternType')
     }
 
+    if (filter.startDate) {
+      setCurrentPage(1);
+      coursesFiltered = filterCoursesByStartDate(coursesFiltered, filter.startDate)
+    }
+
+    if (filter.sort) {
+      setCurrentPage(1);
+      coursesFiltered = sortCourses(coursesFiltered, filter.sort)
+    }
+
     setCourses(coursesFiltered)
     setCoursesCount(coursesFiltered.length);
 
   }, [filter, getCourses]);
 
+  const selectionHandle = (event, selection) => {
+    const value = event.target.value;
+    setFilter((prevFilter) => ({
+      ...prevFilter,
+      [selection]: value,
+    })); 
+  };
 
 
 
@@ -141,9 +212,6 @@ const Page = () => {
       ? [...filter[type], newArray.name]
       : filter[type].filter((type) => type !== newArray.name);
 
-    // // Create a new state object with the updated courseType array
-    // const updatedFilter = { ...filter, courseType: updatedCourseType };
-
     setFilter((prevFilter) => ({
       ...prevFilter,
       [type]: updatedCourseType,
@@ -151,7 +219,6 @@ const Page = () => {
     setAccordionData(updatedAccordionData);
   };
   
-
   const coursesCountAmount = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, courses.length);
@@ -277,14 +344,7 @@ const Page = () => {
   };
 
   const clearFilters = () => {
-    setFilter({
-      sort: "",
-      courseType: [],
-      courseHours: [],
-      courseStudyTime: [],
-      searchTerm: ''
-    });
-
+    setFilter(initialFilter);
     let accordionDataCleared = []
 
     accordionData.map(type => { 
@@ -298,7 +358,6 @@ const Page = () => {
     setAccordionData(accordionDataCleared)
   
   }
-
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, courses.length);
@@ -407,11 +466,15 @@ const Page = () => {
                   <h4>Sort by</h4>
                 </label>
                 <div class="wmcads-fe-dropdown">
-                  <select class="wmcads-fe-dropdown__select" id="dropdown" name="dropdown">
-                    <option value="" selected="selected">Choose from list</option>
-                    <option value="1">Relevance</option>
-                    <option value="2">Most recent</option>
-                    <option value="3">Oldest</option>
+                <select
+                  class="wmcads-fe-dropdown__select"
+                  id="sort"
+                  name="sort"
+                  value={filter.sort} // Set the value of the dropdown to the state variable
+                  onChange={e => selectionHandle(e, 'sort')} // Set the event handler for dropdown changes
+                >
+                    <option value="" selected="selected">Relevance</option>
+                    <option value="1">Start date</option>
                   </select>
                 </div>
               {/* </div> */}
@@ -433,11 +496,6 @@ const Page = () => {
                   Previous page
                 </a>
               )}
-              
-              
-              {/* <button onClick={handlePrevPage} disabled={currentPage === 1}>
-                Previous
-              </button> */}
               <ol className="wmcads-pagination__nav">
                 {generatePageIndexPagination()}
               </ol>
@@ -458,12 +516,18 @@ const Page = () => {
                 <h3>Start date</h3>
                 </label>
                 <div class="wmcads-fe-dropdown">
-                  <select class="wmcads-fe-dropdown__select" id="dropdown" name="dropdown">
-                    <option value="" selected="selected">Choose from list</option>
-                    <option value="1">Relevance</option>
-                    <option value="2">Most recent</option>
-                    <option value="3">Oldest</option>
-                  </select>
+                <select
+                  className="wmcads-fe-dropdown__select"
+                  id="startDate"
+                  name="startDate"
+                  value={filter.startDate} // Set the value of the dropdown to the state variable
+                  onChange={e => selectionHandle(e, 'startDate')} // Set the event handler for dropdown changes
+                >
+                    <option value="">Anytime</option>
+                    <option value="New 3 months">New 3 months</option>
+                    <option value="In 3 to 6 months">In 3 to 6 months</option>
+                    <option value="More than 6 months">More than 6 months</option>
+                </select>
                 </div>
               </div>
               <div class="wmcads-hide-desktop"><button class="wmcads-btn wmcads-btn--primary wmcads-btn--block" id="show_filter_btn" aria-controls="search_filter" aria-expanded="false">Filter your results</button></div>
@@ -481,26 +545,28 @@ const Page = () => {
                 {accordionData.map((accordion, index) => (
                   <AccordionComponent key={index} data={accordion} index={index} ChildComponent={<CheckboxComponent options={accordion.checkbox} accordionIndex={index} onCheckboxChange={handleCheckboxChange} />} />
                 ))}
-                <a href="#"
-                  className="wmcads-search-filter__clear-all wmcads-hide-mobile"
-                  onClick={clearFilters}
-                >
-                  <svg
-                    style={{
-                      display: "inline-block",
-                      fill: "#c05701",
-                      stroke: "#c05701",
-                      strokeWidth: "25px",
-                    }}
-                  >
-                    <title>Close</title>
-                    <use
-                      xlinkHref="#wmcads-general-cross"
-                      href="#wmcads-general-cross"
-                    ></use>
-                  </svg>
-                  Clear all filters
-                </a>
+                  {filterIsModified &&
+                    <a href="#"
+                    className="wmcads-search-filter__clear-all wmcads-hide-mobile"
+                    onClick={clearFilters}
+                    >
+                      <svg
+                        style={{
+                          display: "inline-block",
+                          fill: "#c05701",
+                          stroke: "#c05701",
+                          strokeWidth: "25px",
+                        }}
+                        >
+                        <title>Close</title>
+                        <use
+                          xlinkHref="#wmcads-general-cross"
+                          href="#wmcads-general-cross"
+                          ></use>
+                      </svg>
+                      Clear all filters
+                    </a>
+                  }
               </div>
           </aside>
         </div>
