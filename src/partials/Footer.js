@@ -5,7 +5,7 @@ const Footer = () => {
     <footer className="wmcads-footer">
       <div className="wmcads-container wmcads-grid">
         <div className="wmcads-col-1 wmcads-col-md-1-2">
-          &COPY; West Midlands Combined Authority 2022
+          &copy; West Midlands Combined Authority 2022
         </div>
         <div className="wmcads-col-1 wmcads-col-md-1-2">
           <a
