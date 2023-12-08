@@ -17,7 +17,16 @@ const searchCourses = (courses, searchTerm) => {
 };
 
 const filterCourses = (courses, studyModes, filterType) => {
-  return courses.filter(course => studyModes.includes(course[filterType]));
+
+  const searchValue = 'Day or block release';
+  const replacementValue = 'Day/Block Release';
+
+  // Using map to create a new array with replaced values
+  const updatedStudyModes = studyModes.map(option =>
+    option.includes(searchValue) ? replacementValue : option
+  );
+
+  return courses.filter(course => updatedStudyModes.includes(course[filterType]));
 };
 
 const sortCourses = (courses) => {
@@ -96,14 +105,20 @@ const Page = () => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [loading, setLoading] = useState(false);
   const [filterIsModified, setFilterIsModified] = useState(false);
-  
-  const [filter, setFilter] = useState({
-    startDate: "",
-    sort: "",
-    courseType: [],
-    courseHours: [],
-    courseStudyTime: [],
-    searchTerm: ''
+
+  const paramNames = ['startDate', 'sort', 'courseType', 'courseHours', 'courseStudyTime', 'searchTerm'];
+
+  const [filter, setFilter] = useState(() => {
+    const initialState = {};
+    paramNames.forEach(param => {
+      if (param === 'courseType' || param === 'courseHours' || param === 'courseStudyTime') {
+        const paramValue = searchParams.get(param);
+        initialState[param] = paramValue ? paramValue.split(',') : [];
+      } else {
+        initialState[param] = searchParams.get(param) || '';
+      }
+    });
+    return initialState;
   });
 
   const initialFilter = {
@@ -136,11 +151,12 @@ const Page = () => {
     // Update the URL when the page or search term changes
     const newSearchParams = new URLSearchParams();
     newSearchParams.set('page', currentPage);
-    newSearchParams.set('search', filter.searchTerm);
-    newSearchParams.set('courseType', filter.courseType);
-    newSearchParams.set('courseHours', filter.courseHours);
-    newSearchParams.set('courseStudyTime', filter.courseStudyTime);
-    newSearchParams.set('startDate', filter.startDate);
+
+    const paramsToSet = ['searchTerm', 'courseType', 'courseHours', 'courseStudyTime', 'startDate', 'sort'];
+    paramsToSet.forEach(param => {
+      newSearchParams.set(param, filter[param]);
+    });
+
 
     // Use replaceState to prevent adding a new entry to the history stack
     window.history.replaceState({}, '', `?${newSearchParams.toString()}`);
@@ -149,8 +165,28 @@ const Page = () => {
   useEffect(() => {
 
     const hasFilterSetted = JSON.stringify(filter) !== JSON.stringify(initialFilter)
-
     setFilterIsModified(hasFilterSetted)
+
+    const loadedAccordionData = []
+
+    const updateCheckedProperty = (checkbox, value) => {
+      checkbox.checked = value;
+    };
+
+    accordionData.map(category => {
+      const arrayToCheck = category.type === 'courseHours' ? filter.courseHours :
+        category.type === 'courseType' ? filter.courseType :
+          category.type === 'courseStudyTime' ? filter.courseStudyTime :
+            [];
+
+        category.checkbox.forEach(checkbox => {
+          updateCheckedProperty(checkbox, arrayToCheck.includes(checkbox.name));
+        });
+      
+      loadedAccordionData.push(category);
+    });
+
+    setAccordionData(loadedAccordionData)
 
     let coursesFiltered = getCourses;
     
@@ -184,8 +220,10 @@ const Page = () => {
       coursesFiltered = sortCourses(coursesFiltered, filter.sort)
     }
 
-    setCourses(coursesFiltered)
-    setCoursesCount(coursesFiltered.length);
+    // if (coursesFiltered !== courses) {
+      setCourses(coursesFiltered)
+      setCoursesCount(coursesFiltered.length);
+    // }
 
   }, [filter, getCourses]);
 
@@ -209,8 +247,10 @@ const Page = () => {
 
     // // Check if newArray is checked, then add or remove from courseType
     const updatedCourseType = newArray.checked
-      ? [...filter[type], newArray.name]
-      : filter[type].filter((type) => type !== newArray.name);
+      ? [...(Array.isArray(filter[type]) ? filter[type] : []), newArray.name]
+      : Array.isArray(filter[type])
+        ? filter[type].filter((type) => type !== newArray.name)
+        : [];
 
     setFilter((prevFilter) => ({
       ...prevFilter,
@@ -252,7 +292,6 @@ const Page = () => {
       return text;
     } else {
       const lastSpaceIndex = text.lastIndexOf(' ', maxLength - 4);
-      // Trim the text to the last space and add "..."
       return text.substring(0, lastSpaceIndex) + '...';
     }
   }
@@ -408,7 +447,7 @@ const Page = () => {
                 </table>
               </div>
             ))
-          ) : (
+          ) : ( 
             <div className="wmcads-msg-summary wmcads-msg-summary--warning" style={{marginTop: '40px'}}>
               <div className="wmcads-msg-summary__header">
                 <svg className="wmcads-msg-summary__icon">
@@ -474,7 +513,7 @@ const Page = () => {
                   onChange={e => selectionHandle(e, 'sort')} // Set the event handler for dropdown changes
                 >
                     <option value="" selected="selected">Relevance</option>
-                    <option value="1">Start date</option>
+                  <option value="Start date">Start date</option>
                   </select>
                 </div>
               {/* </div> */}
@@ -499,7 +538,7 @@ const Page = () => {
               <ol className="wmcads-pagination__nav">
                 {generatePageIndexPagination()}
               </ol>
-              { coursesCount > 0 && !loading &&
+              { coursesCount > 1 && !loading &&
                 <a onClick={handleNextPage} href="#" target="_self" class="wmcads-pagination__next wmcads-link wmcads-link--with-chevron">
                   Next page
                   <svg class="wmcads-link__chevron wmcads-link__chevron--right">
