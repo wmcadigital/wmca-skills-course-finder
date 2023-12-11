@@ -67,8 +67,8 @@ const Page = () => {
   }
 
   return (
-    <div className="course-page">
-      <div className="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg">
+    <div className="course-details-page">
+      <div className="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none ">
         <h1 id="wmcads-main-content">{getCourse.CourseName}</h1>
         <h2>Course details</h2>
         <table class="wmcads-table wmcads-m-b-xl wmcads-table--without-header">

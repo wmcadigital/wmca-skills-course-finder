@@ -71,6 +71,8 @@ const filterCoursesByStartDate = (courses, startBy) => {
 }
 
 const Page = () => {
+  const [isOpenMobileFilters, setIsOpenMobileFilters] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
   const [courses, setCourses] = useState([]);
   const [getCourses, setGetCourses] = useState([]);
   const [coursesCount, setCoursesCount] = useState(0);
@@ -129,6 +131,18 @@ const Page = () => {
     courseStudyTime: [],
     searchTerm: ''
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 767);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []); // Empty dependency array ensures that this effect runs once
 
   useEffect(() => {
     const fetchData = async () => {
@@ -235,7 +249,10 @@ const Page = () => {
     })); 
   };
 
-
+  const toggleMobileFilters = (e) => {
+    e.preventDefault()
+    setIsOpenMobileFilters(!isOpenMobileFilters)
+  }
 
   const handleCheckboxChange = (accordionIndex, checkboxIndex) => {
     const updatedAccordionData = [...accordionData];
@@ -295,6 +312,56 @@ const Page = () => {
       return text.substring(0, lastSpaceIndex) + '...';
     }
   }
+
+  const countSortBy = () => {
+    return (
+      <div className="course-count-sort-by-wrapper">
+        {coursesCountAmount()}
+        <label class="wmcads-fe-label" for="dropdown">
+          <h4>Sort by</h4>
+        </label>
+        <div class="wmcads-fe-dropdown">
+          <select
+            class="wmcads-fe-dropdown__select"
+            id="sort"
+            name="sort"
+            value={filter.sort} // Set the value of the dropdown to the state variable
+            onChange={e => selectionHandle(e, 'sort')} // Set the event handler for dropdown changes
+            >
+            <option value="" selected="selected">Relevance</option>
+            <option value="Start date">Start date</option>
+          </select>
+        </div>
+      </div>
+    )
+  }
+
+  const searchByStartDate = () => {
+    return (
+      <div class="wmcads-search-sort wmcads-fe-group">
+        <label class="wmcads-fe-label" for="dropdown">
+          <h3>Start date</h3>
+          {isOpenMobileFilters}
+        </label>
+        <div class="wmcads-fe-dropdown">
+          <select
+            className="wmcads-fe-dropdown__select"
+            id="startDate"
+            name="startDate"
+            value={filter.startDate} // Set the value of the dropdown to the state variable
+            onChange={e => selectionHandle(e, 'startDate')} // Set the event handler for dropdown changes
+          >
+            <option value="">Anytime</option>
+            <option value="New 3 months">New 3 months</option>
+            <option value="In 3 to 6 months">In 3 to 6 months</option>
+            <option value="More than 6 months">More than 6 months</option>
+          </select>
+        </div>
+      </div>
+    )
+  }
+
+
   const handleNextPage = (e) => {
     e.preventDefault();
     setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
@@ -393,9 +460,7 @@ const Page = () => {
       })
       accordionDataCleared.push(type)
     })
-
-    setAccordionData(accordionDataCleared)
-  
+    setAccordionData(accordionDataCleared)  
   }
 
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -479,8 +544,8 @@ const Page = () => {
   return (
     <div class="template-search">
       <div class="wmcads-m-b-lg">
-        <h1 id="wmcads-main-content" class="wmcads-hide-mobile">Find courses for jobs</h1>
-        <div class="wmcads-col-1 wmcads-col-md-2-3 wmcads-p-r-xl">
+        <h1 id="wmcads-main-content">Find courses for jobs</h1>
+        <div class="wmcads-col-1 wmcads-col-md-2-3 wmcads-p-r-xl wmcads-p-r-sm-none">
           <form id="searchBar_form" class="wmcads-search-bar">
             <input id="searchBar_input" aria-label="Search" type="text" value={filter.searchTerm} class="wmcads-search-bar__input wmcads-fe-input" placeholder="Search course title or subject..." onChange={(e) => setFilter((prevFilter) => ({
               ...prevFilter,
@@ -495,120 +560,82 @@ const Page = () => {
           </form>
         </div>
       </div>
-      <div>
-        <div class="wmcads-grid">
-          <div class="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg">
-            <div className="course-count-sort-by-wrapper">
-              {coursesCountAmount()}
-              {/* <div class="wmcads-search-sort wmcads-fe-group"> */}
-                <label class="wmcads-fe-label" for="dropdown">
-                  <h4>Sort by</h4>
-                </label>
-                <div class="wmcads-fe-dropdown">
-                <select
-                  class="wmcads-fe-dropdown__select"
-                  id="sort"
-                  name="sort"
-                  value={filter.sort} // Set the value of the dropdown to the state variable
-                  onChange={e => selectionHandle(e, 'sort')} // Set the event handler for dropdown changes
-                >
-                    <option value="" selected="selected">Relevance</option>
-                  <option value="Start date">Start date</option>
-                  </select>
-                </div>
-              {/* </div> */}
-            </div>
-            {CoursesFound(currentCourseItems)}
-            <div className="wmcads-pagination wmcads-m-t-xl">
-              {currentPage > 1 && (
-                <a
-                  href="#"
-                  onClick={handlePrevPage} disabled={currentPage === 1}
-                  className="wmcads-pagination__prev wmcads-link wmcads-link--with-chevron"
-                >
-                  <svg className="wmcads-link__chevron wmcads-link__chevron--left">
-                    <use
-                      xlinkHref="#wmcads-general-chevron-right"
-                      href="#wmcads-general-chevron-right"
-                    ></use>
-                  </svg>{" "}
-                  Previous page
-                </a>
-              )}
-              <ol className="wmcads-pagination__nav">
-                {generatePageIndexPagination()}
-              </ol>
-              { coursesCount > 1 && !loading &&
-                <a onClick={handleNextPage} href="#" target="_self" class="wmcads-pagination__next wmcads-link wmcads-link--with-chevron">
-                  Next page
-                  <svg class="wmcads-link__chevron wmcads-link__chevron--right">
-                    <use href="#wmcads-general-chevron-right" href="#wmcads-general-chevron-right"></use>
+      <div class="wmcads-grid">
+        <div class="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none">
+          {countSortBy()}
+          {isMobile && searchByStartDate()}
+          <div class="wmcads-hide-desktop" onClick={toggleMobileFilters}><button class="wmcads-btn wmcads-btn--primary wmcads-btn--block" id="show_filter_btn" aria-controls="search_filter" aria-expanded="false">Filter your results</button></div>
+          {CoursesFound(currentCourseItems)}
+          <div className="wmcads-pagination wmcads-m-t-xl">
+            {currentPage > 1 && (
+              <a
+                href="#"
+                onClick={handlePrevPage} disabled={currentPage === 1}
+                className="wmcads-pagination__prev wmcads-link wmcads-link--with-chevron"
+              >
+                <svg className="wmcads-link__chevron wmcads-link__chevron--left">
+                  <use
+                    xlinkHref="#wmcads-general-chevron-right"
+                    href="#wmcads-general-chevron-right"
+                  ></use>
+                </svg>{" "}
+                Previous page
+              </a>
+            )}
+            <ol className="wmcads-pagination__nav">
+              {generatePageIndexPagination()}
+            </ol>
+            {currentCourseItems.length === 10 && !loading &&
+              <a onClick={handleNextPage} href="#" target="_self" class="wmcads-pagination__next wmcads-link wmcads-link--with-chevron">
+                Next page
+                <svg class="wmcads-link__chevron wmcads-link__chevron--right">
+                  <use href="#wmcads-general-chevron-right" href="#wmcads-general-chevron-right"></use>
+                </svg>
+              </a>
+            }
+          </div>
+        </div>
+        <aside class="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
+          <hr class="wmcads-hide-desktop"/>
+          {!isMobile && searchByStartDate() }
+          <div id="search_filter" class={`wmcads-search-filter ${isOpenMobileFilters ? 'open' : ''}`}>
+              <div class="wmcads-search-filter__header">
+                <h3 class="wmcads-search-filter__header-title">Filter</h3>
+              {filterIsModified && <a href="#" class="wmcads-hide-desktop wmcads-link wmcads-hide-desktop hide-desktop" onClick={clearFilters}>Clear all</a>}
+                <a href="#" id="hide_filter_btn" class="wmcads-search-filter__close" onClick={toggleMobileFilters}>
+                  <svg>
+                    <title>Close</title>
+                    <use href="#wmcads-general-cross" href="#wmcads-general-cross"></use>
                   </svg>
                 </a>
-              }
-            </div>
-          </div>
-          <aside class="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
-            <hr class="wmcads-hide-desktop"/>
-              <div class="wmcads-search-sort wmcads-fe-group">
-                <label class="wmcads-fe-label" for="dropdown">
-                <h3>Start date</h3>
-                </label>
-                <div class="wmcads-fe-dropdown">
-                <select
-                  className="wmcads-fe-dropdown__select"
-                  id="startDate"
-                  name="startDate"
-                  value={filter.startDate} // Set the value of the dropdown to the state variable
-                  onChange={e => selectionHandle(e, 'startDate')} // Set the event handler for dropdown changes
-                >
-                    <option value="">Anytime</option>
-                    <option value="New 3 months">New 3 months</option>
-                    <option value="In 3 to 6 months">In 3 to 6 months</option>
-                    <option value="More than 6 months">More than 6 months</option>
-                </select>
-                </div>
               </div>
-              <div class="wmcads-hide-desktop"><button class="wmcads-btn wmcads-btn--primary wmcads-btn--block" id="show_filter_btn" aria-controls="search_filter" aria-expanded="false">Filter your results</button></div>
-              <div id="search_filter" class="wmcads-search-filter">
-                <div class="wmcads-search-filter__header">
-                  <h3 class="wmcads-search-filter__header-title">Filter</h3>
-                  <a href="#" class="wmcads-search-filter__clear-all wmcads-hide-desktop">Clear all</a>
-                  <a href="#" id="hide_filter_btn" class="wmcads-search-filter__close">
-                    <svg>
+              {accordionData.map((accordion, index) => (
+                <AccordionComponent key={index} data={accordion} index={index} ChildComponent={<CheckboxComponent options={accordion.checkbox} accordionIndex={index} onCheckboxChange={handleCheckboxChange} />} />
+              ))}
+                {filterIsModified &&
+                  <a href="#"
+                  className="wmcads-search-filter__clear-all wmcads-hide-mobile"
+                  onClick={clearFilters}
+                  >
+                    <svg
+                      style={{
+                        display: "inline-block",
+                        fill: "#c05701",
+                        stroke: "#c05701",
+                        strokeWidth: "25px",
+                      }}
+                      >
                       <title>Close</title>
-                      <use href="#wmcads-general-cross" href="#wmcads-general-cross"></use>
+                      <use
+                        xlinkHref="#wmcads-general-cross"
+                        href="#wmcads-general-cross"
+                        ></use>
                     </svg>
+                    Clear all filters
                   </a>
-                </div>
-                {accordionData.map((accordion, index) => (
-                  <AccordionComponent key={index} data={accordion} index={index} ChildComponent={<CheckboxComponent options={accordion.checkbox} accordionIndex={index} onCheckboxChange={handleCheckboxChange} />} />
-                ))}
-                  {filterIsModified &&
-                    <a href="#"
-                    className="wmcads-search-filter__clear-all wmcads-hide-mobile"
-                    onClick={clearFilters}
-                    >
-                      <svg
-                        style={{
-                          display: "inline-block",
-                          fill: "#c05701",
-                          stroke: "#c05701",
-                          strokeWidth: "25px",
-                        }}
-                        >
-                        <title>Close</title>
-                        <use
-                          xlinkHref="#wmcads-general-cross"
-                          href="#wmcads-general-cross"
-                          ></use>
-                      </svg>
-                      Clear all filters
-                    </a>
-                  }
-              </div>
-          </aside>
-        </div>
+                }
+            </div>
+        </aside>
       </div>
     </div>
   );

@@ -55,7 +55,7 @@ code {
   display: block;
 }
 
-.course-page table th {
+.course-details-page table th {
   width: 150px;
 }
 
@@ -75,7 +75,26 @@ code {
       height: 30px;
       margin: 0;
     }
+
+    .hide-desktop {
+      display: none;
+    }
 }
+
+@media only screen and (max-width: 767px) {
+    .template-search .wmcads-p-r-sm-none, .course-details-page .wmcads-p-r-sm-none {
+      padding-right: 0;
+    }
+    .course-count-sort-by-wrapper {
+      padding: 0;
+    }
+
+    .wmcads-search-filter.open {
+      visibility: visible;
+      opacity: 100;
+    }
+}
+
 
 
 .pulse {
@@ -109,3 +128,4 @@ code {
 .load-wrapper-main {
   margin-top: 40px;
 }
+

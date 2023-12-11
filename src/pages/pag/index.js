@@ -121,7 +121,6 @@ const Page = () => {
     <div>
       <div>
         <input type="text" placeholder="Search" value={searchTerm} onChange={handleSearchChange} />
-        {console.log(currentItems, 'lists in view')}
         {currentItems.map((item, index) => (
           <div>
             <div key={index}>{item.CourseDescription}</div>
