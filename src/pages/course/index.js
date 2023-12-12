@@ -12,6 +12,7 @@ import { courseProviders$ } from '../../services/rxjsStoreCourseProviders'
 const courseName$ = new Subject();
 
 const Page = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
   const navigate = useNavigate();
   const [getCourse, setGetCourse] = useState([]);
   const [courseProvider, setCourseProvider] = useState([]);
@@ -23,7 +24,17 @@ const Page = () => {
   const locationName = queryParams.get('locationName');
   const durationValue = queryParams.get('durationValue');
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 767);
+    };
 
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []); // Empty dependency array ensures that this effect runs once
 
   useEffect(() => {
     const subscription = combineLatest([course$, courseProviders$]).subscribe(async ([course, courseProviders]) => {
@@ -82,10 +93,25 @@ const Page = () => {
     });
   }
 
+  const providerDetails = (courseProvider) => {
+    return (
+      <div class="wmcads-content-card wmcads-m-b-lg">
+        <div class="wmcads-p-sm">
+          <h2>Course provider</h2>
+          <p><strong>{courseProvider.CourseProvider}</strong></p>
+          <p className="mtb-10"><strong>Website:</strong> <a className="wmcads-link" href={courseProvider.Website} target="_blank" rel="noopener noreferrer">{courseProvider.Website}</a></p>
+          {courseProvider.ContactEmail && <p className="mtb-10"><strong>Email:</strong> <a className="wmcads-link" href={`mailto:${courseProvider.ContactEmail}`}>{courseProvider.ContactEmail}</a></p>}
+          <p className="mtb-10"><strong>Phone:</strong> <a className="wmcads-link" href={`tel:${courseProvider.ContactPhone}`}>{courseProvider.ContactPhone}</a></p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="course-details-page">
       <div className="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none ">
         <h1 id="wmcads-main-content">{getCourse.CourseName}</h1>
+        {isMobile && providerDetails(courseProvider)}
         <h2>Course details</h2>
         <table class="wmcads-table wmcads-m-b-xl wmcads-table--without-header">
           <tbody>
@@ -122,15 +148,7 @@ const Page = () => {
         <a href="#" onClick={handleGoBack} title="link title" target="_self" className="wmcads-link"><span>&lt; Back to results</span></a>
       </div>
       <aside class="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
-        <div class="wmcads-content-card wmcads-m-b-lg">
-          <div class="wmcads-p-sm">
-            <h2>Course provider</h2>
-            <p><strong>{courseProvider.CourseProvider}</strong></p>
-            <p className="mtb-10"><strong>Website:</strong> <a className="wmcads-link" href={courseProvider.Website} target="_blank" rel="noopener noreferrer">{courseProvider.Website}</a></p>            
-            {courseProvider.ContactEmail && <p className="mtb-10"><strong>Email:</strong> <a className="wmcads-link" href={`mailto:${courseProvider.ContactEmail}`}>{courseProvider.ContactEmail}</a></p>}
-            <p className="mtb-10"><strong>Phone:</strong> <a className="wmcads-link" href={`tel:${courseProvider.ContactPhone}`}>{courseProvider.ContactPhone}</a></p>            
-          </div>
-        </div>
+        {!isMobile && providerDetails(courseProvider)}
       </aside>
     </div>
   );

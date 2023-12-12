@@ -10,7 +10,6 @@ class ApiCourses {
   // Function to fetch data from the API
   fetchDataFromApi = async () => {
     try {
-      // Simulate an API call
       const response = await fetch(endPoint, {
         method: 'GET', // or 'POST' or other HTTP methods
       });
