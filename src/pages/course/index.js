@@ -1,19 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import AppLayout from '../../layout/index';
 import ApiCourse from '../../services/apiCourse'
 import ApiCourseProviders from '../../services/apiCourseProviders'
 import moment from 'moment';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Subject } from 'rxjs';
-import { firstValueFrom, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { course$ } from '../../services/rxjsStoreCourse'
 import { courseProviders$ } from '../../services/rxjsStoreCourseProviders'
 
 const courseName$ = new Subject();
 
-
 const Page = () => {
-  // const course = []
   const navigate = useNavigate();
   const [getCourse, setGetCourse] = useState([]);
   const [courseProvider, setCourseProvider] = useState([]);
@@ -24,6 +22,8 @@ const Page = () => {
   const startDate = queryParams.get('startDate');
   const locationName = queryParams.get('locationName');
   const durationValue = queryParams.get('durationValue');
+
+
 
   useEffect(() => {
     const subscription = combineLatest([course$, courseProviders$]).subscribe(async ([course, courseProviders]) => {
@@ -47,7 +47,6 @@ const Page = () => {
           setGetCourse(course);
           courseName$.next(course.CourseName)
 
-          console.log(course, 'here')
         }
 
       } catch (error) {
@@ -137,18 +136,14 @@ const Page = () => {
   );
 };
 
-const Course = () => {
+const Course = (props) => {
   const [courseName, setCourseName] = useState(undefined);
 
   useEffect(() => {
 
-    const fetchData = async () => {
-      const name = await firstValueFrom(courseName$);
+    courseName$.subscribe(name => {
       setCourseName(name);
-    };
-
-    fetchData();
-
+    })
 
   }, []); 
 

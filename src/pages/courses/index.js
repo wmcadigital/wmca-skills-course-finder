@@ -175,7 +175,6 @@ const Page = () => {
       newSearchParams.set(param, filter[param]);
     });
 
-
     // Use replaceState to prevent adding a new entry to the history stack
     window.history.replaceState({}, '', `#/course-finder?${newSearchParams.toString()}`);
   }, [currentPage, filter]);
@@ -196,7 +195,6 @@ const Page = () => {
         category.type === 'courseType' ? filter.courseType :
           category.type === 'courseStudyTime' ? filter.courseStudyTime :
             [];
-
         category.checkbox.forEach(checkbox => {
           updateCheckedProperty(checkbox, arrayToCheck.includes(checkbox.name));
         });
@@ -362,7 +360,6 @@ const Page = () => {
       <div class="wmcads-search-sort wmcads-fe-group">
         <label class="wmcads-fe-label" for="dropdown">
           <h3>Start date</h3>
-          {isOpenMobileFilters}
         </label>
         <div class="wmcads-fe-dropdown">
           <select
@@ -377,6 +374,30 @@ const Page = () => {
             <option value="In 3 to 6 months">In 3 to 6 months</option>
             <option value="More than 6 months">More than 6 months</option>
           </select>
+        </div>
+      </div>
+    )
+  }
+
+  const countSortByMobile = () => {
+    return (
+      <div class="wmcads-search-sort wmcads-fe-group">
+        <label class="wmcads-fe-label" for="dropdown">
+          <h3>Sort by</h3>
+        </label>
+        <div class="wmcads-fe-dropdown">
+          <div class="wmcads-fe-dropdown">
+            <select
+              class="wmcads-fe-dropdown__select"
+              id="sort"
+              name="sort"
+              value={filter.sort} // Set the value of the dropdown to the state variable
+              onChange={e => selectionHandle(e, 'sort')} // Set the event handler for dropdown changes
+            >
+              <option value="" selected="selected">Relevance</option>
+              <option value="Start date">Start date</option>
+            </select>
+          </div>
         </div>
       </div>
     )
@@ -572,7 +593,7 @@ const Page = () => {
               ...prevFilter,
               searchTerm: e.target.value,
             }))} />
-              <button class="wmcads-search-bar__btn" type="submit">
+              <button class="wmcads-search-bar__btn" type="submit" onClick={(e) => e.preventDefault()}>
                 <svg>
                   <title>Search</title>
                   <use xlinkHref="#wmcads-general-search" href="#wmcads-general-search"></use>
@@ -583,7 +604,11 @@ const Page = () => {
       </div>
       <div class="wmcads-grid">
         <div class="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none">
-          {countSortBy()}
+            {!isMobile && countSortBy()}
+          <div style={{paddingBottom: '20px'}}>
+            {isMobile &&  coursesCountAmount() }
+          </div>
+          {isMobile && countSortByMobile()}
           {isMobile && searchByStartDate()}
           <div class="wmcads-hide-desktop" onClick={toggleMobileFilters}><button class="wmcads-btn wmcads-btn--primary wmcads-btn--block" id="show_filter_btn" aria-controls="search_filter" aria-expanded="false">Filter your results</button></div>
           {CoursesFound(currentCourseItems)}
@@ -622,7 +647,7 @@ const Page = () => {
           <div id="search_filter" class={`wmcads-search-filter ${isOpenMobileFilters ? 'open' : ''}`}>
               <div class="wmcads-search-filter__header">
                 <h3 class="wmcads-search-filter__header-title">Filter</h3>
-              {filterIsModified && <a href="#" class="wmcads-hide-desktop wmcads-link wmcads-hide-desktop hide-desktop" onClick={clearFilters}>Clear all</a>}
+                {filterIsModified && <a href="#" class="wmcads-hide-desktop wmcads-link wmcads-hide-desktop hide-desktop" onClick={clearFilters}>Clear all</a>}
                 <a href="#" id="hide_filter_btn" class="wmcads-search-filter__close" onClick={toggleMobileFilters}>
                   <svg>
                     <title>Close</title>
@@ -633,28 +658,29 @@ const Page = () => {
               {accordionData.map((accordion, index) => (
                 <AccordionComponent key={index} data={accordion} index={index} ChildComponent={<CheckboxComponent options={accordion.checkbox} accordionIndex={index} onCheckboxChange={handleCheckboxChange} />} />
               ))}
-                {filterIsModified &&
-                  <a href="#"
-                  className="wmcads-search-filter__clear-all wmcads-hide-mobile"
-                  onClick={clearFilters}
-                  >
-                    <svg
-                      style={{
-                        display: "inline-block",
-                        fill: "#c05701",
-                        stroke: "#c05701",
-                        strokeWidth: "25px",
-                      }}
-                      >
-                      <title>Close</title>
-                      <use
-                        xlinkHref="#wmcads-general-cross"
-                        href="#wmcads-general-cross"
-                        ></use>
-                    </svg>
-                    Clear all filters
-                  </a>
-                }
+            {filterIsModified && <div class="wmcads-container wmcads-hide-desktop" onClick={toggleMobileFilters}><button class="wmcads-btn wmcads-btn--primary wmcads-btn--block" id="show_filter_btn" aria-controls="search_filter" aria-expanded="false">Apply fliters</button></div>}
+              {filterIsModified &&
+                <a href="#"
+                className="wmcads-search-filter__clear-all wmcads-hide-mobile"
+                onClick={clearFilters}
+                >
+                  <svg
+                    style={{
+                      display: "inline-block",
+                      fill: "#c05701",
+                      stroke: "#c05701",
+                      strokeWidth: "25px",
+                    }}
+                    >
+                    <title>Close</title>
+                    <use
+                      xlinkHref="#wmcads-general-cross"
+                      href="#wmcads-general-cross"
+                      ></use>
+                  </svg>
+                  Clear all filters
+                </a>
+              }
             </div>
         </aside>
       </div>
