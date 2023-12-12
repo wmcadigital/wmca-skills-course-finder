@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import AppLayout from '../../layout/index';
-import apiCoursesService from '../../services/apiCoursesService'
+import apiCoursesService from '../../services/apiCourses'
 import moment from 'moment';
 import AccordionComponent from '../../components/accordion'
 import CheckboxComponent from '../../components/checkbox'
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { setCourse$ } from '../../services/rxjsStoreCourse'
+import { setCourseProviders$ } from '../../services/rxjsStoreCourseProviders'
+import ApiCourseProviders from '../../services/apiCourseProviders'
 
 const itemsPerPage = 10;
 const maxIndexButtons = 5;
@@ -71,6 +74,7 @@ const filterCoursesByStartDate = (courses, startBy) => {
 }
 
 const Page = () => {
+  const navigate = useNavigate();
   const [isOpenMobileFilters, setIsOpenMobileFilters] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
   const [courses, setCourses] = useState([]);
@@ -173,7 +177,7 @@ const Page = () => {
 
 
     // Use replaceState to prevent adding a new entry to the history stack
-    window.history.replaceState({}, '', `?${newSearchParams.toString()}`);
+    window.history.replaceState({}, '', `#/course-finder?${newSearchParams.toString()}`);
   }, [currentPage, filter]);
 
   useEffect(() => {
@@ -234,10 +238,8 @@ const Page = () => {
       coursesFiltered = sortCourses(coursesFiltered, filter.sort)
     }
 
-    // if (coursesFiltered !== courses) {
       setCourses(coursesFiltered)
       setCoursesCount(coursesFiltered.length);
-    // }
 
   }, [filter, getCourses]);
 
@@ -246,13 +248,32 @@ const Page = () => {
     setFilter((prevFilter) => ({
       ...prevFilter,
       [selection]: value,
-    })); 
+    }));
   };
 
   const toggleMobileFilters = (e) => {
     e.preventDefault()
     setIsOpenMobileFilters(!isOpenMobileFilters)
   }
+
+  const courseDetailsLink = (e, course) => {
+    e.preventDefault()
+    setCourse$(course)
+    
+    const fetchProviders = async () => {
+      try {
+        const courseProvider = await ApiCourseProviders(course.UKPRN);
+        setCourseProviders$(courseProvider)
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchProviders();
+    
+    // Redirect to the details page
+    navigate(`/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`);
+  };
 
   const handleCheckboxChange = (accordionIndex, checkboxIndex) => {
     const updatedAccordionData = [...accordionData];
@@ -486,9 +507,9 @@ const Page = () => {
             currentCourseItems.map((course, index) => (
               <div key={index} className="wmcads-search-result">
                 <h2 className="wmcads-m-b-none">
-                  <Link to={`/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`} className="h2 wmcads-search-result__title">
+                  <a href="#" onClick={(e) => courseDetailsLink(e, course)} className="h2 wmcads-search-result__title">
                     {course.CourseName}
-                  </Link>
+                  </a>
                 </h2>
                 <p className="mtb-10">
                   <strong>

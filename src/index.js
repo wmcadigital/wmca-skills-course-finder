@@ -23,8 +23,8 @@ console.log(pathname, 'path name')
 //     </Route>
 //   )
 // );
-// const router = createHashRouter([
-const router = createBrowserRouter([
+const router = createHashRouter([
+// const router = createBrowserRouter([
   {
     path: '/',
     element: <Navigate to = "/course-finder" />,
