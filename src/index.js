@@ -6,23 +6,11 @@ import { RouterProvider, createBrowserRouter, Navigate, createHashRouter, Route,
 // import App from './App.js'
 import Courses from './pages/courses';
 import Course, { loader as courseLoader, } from './pages/course';
-import Pag from './pages/pag';
 import AppLayout from './layout'
 
 const container = document.getElementById("root");
 const root = createRoot(container);
 
-const pathname = window.location.pathname;
-
-console.log(pathname, 'path name')
-// const router = createBrowserRouter(
-//   createRoutesFromElements(
-//     <Route path="/" element={AppLayout}>
-//       <Route index element={<Courses />} />
-//       <Route path="Course" element={<Course />} />
-//     </Route>
-//   )
-// );
 const router = createHashRouter([
 // const router = createBrowserRouter([
   {
@@ -37,10 +25,6 @@ const router = createHashRouter([
     path: "/course-finder/details",
     element: <Course />,
     // loader: courseLoader,
-  },
-  {
-    path: "/pag",
-    element: <Pag />,
   },
 ]);
 
