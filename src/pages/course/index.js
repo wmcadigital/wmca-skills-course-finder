@@ -62,7 +62,6 @@ const Page = () => {
   }, []); // Empty dependency array ensures the effect runs once after the initial render
 
   const startDateFn = (courseDate) => {
-    console.log(courseDate, 'data')
     if (courseDate === undefined) return '';
     const date = moment(courseDate);
     const formattedDate = date.format("MMMM Do YYYY");
@@ -159,7 +158,7 @@ const Course = () => {
       path: '/course-finder',
     },
     {
-      name: courseName,
+      name:  courseName || '',
     },
   ];
 
