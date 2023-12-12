@@ -3,10 +3,8 @@ import {createRoot} from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { RouterProvider, createBrowserRouter, Navigate, createHashRouter, Route, createRoutesFromElements } from "react-router-dom";
-// import App from './App.js'
 import Courses from './pages/courses';
-import Course, { loader as courseLoader, } from './pages/course';
-import AppLayout from './layout'
+import Course from './pages/course';
 
 const container = document.getElementById("root");
 const root = createRoot(container);

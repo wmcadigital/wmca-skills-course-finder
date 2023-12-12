@@ -139,15 +139,18 @@ const Page = () => {
 };
 
 const Course = () => {
-  const [courseName, setCourseName] = useState(null);
+  const [courseName, setCourseName] = useState(undefined);
 
   useEffect(() => {
+
     const fetchData = async () => {
       const name = await firstValueFrom(courseName$);
       setCourseName(name);
     };
 
     fetchData();
+
+
   }, []); 
 
   const breadCrumb = [
