@@ -4,14 +4,12 @@ import ApiCourse from '../../services/apiCourse'
 import ApiCourseProviders from '../../services/apiCourseProviders'
 import moment from 'moment';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Subject } from 'rxjs';
 import { combineLatest } from 'rxjs';
 import { course$ } from '../../services/rxjsStoreCourse'
 import { courseProviders$ } from '../../services/rxjsStoreCourseProviders'
 import { setLoading$ } from '../../services/rxjsStoreLoading'
+import { setCourseName$, courseName$ } from '../../services/rxjsStoreCourseName'
 import AccordionComponent from '../../components/accordion'
-
-const courseName$ = new Subject();
 
 const Page = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
@@ -51,8 +49,7 @@ const Page = () => {
 
           const courseFound = findCourse(course, startDate, durationValue, locationName)
           setGetCourse(courseFound)
-          console.log(courseFound.CourseName, 'not stored')
-          courseName$.next(courseFound.CourseName)
+          setCourseName$(courseFound.CourseName)
 
           const accData = setupAccordionData(courseFound)
           setAccordionData(accData)
@@ -67,8 +64,6 @@ const Page = () => {
             setCourseProvider(courseProviders)
           }
 
-          courseName$.next(course.CourseName)
-          console.log(course.CourseName, 'when stored')
           const accData = setupAccordionData(course)
           setAccordionData(accData)
           setGetCourse(course);
@@ -241,7 +236,7 @@ const Course = () => {
 
     console.log(courseName, 'courseName$')
 
-  }, [courseName]); 
+  }, []); 
 
   const breadCrumb = [
     {

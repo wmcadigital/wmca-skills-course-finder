@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { setCourse$ } from '../../services/rxjsStoreCourse'
 import { setCourseProviders$ } from '../../services/rxjsStoreCourseProviders'
 import ApiCourseProviders from '../../services/apiCourseProviders'
+import { setCourseName$ } from '../../services/rxjsStoreCourseName'
 
 const itemsPerPage = 10;
 const maxIndexButtons = 5;
@@ -257,6 +258,7 @@ const Page = () => {
   const courseDetailsLink = (e, course) => {
     e.preventDefault()
     setCourse$(course)
+    setCourseName$(course.CourseName)
     
     const fetchProviders = async () => {
       try {
