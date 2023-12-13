@@ -19,7 +19,7 @@ const Page = () => {
   const [getCourse, setGetCourse] = useState([]);
   const [courseProvider, setCourseProvider] = useState([]);
   const [accordionData, setAccordionData] = useState(undefined);
-  const [loading, setLoading] = useState(null);
+  const [loading, setLoading] = useState(undefined);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
 
@@ -46,7 +46,7 @@ const Page = () => {
         // Check if dataValue is null and make an API call if needed
         if (course === null) {
           setLoading(true)
-          setLoading$(true)
+          // setLoading$(true)
           const course = await ApiCourse(courseId);
 
           const courseFound = findCourse(course, startDate, durationValue, locationName)
@@ -59,7 +59,7 @@ const Page = () => {
           const getCourseProvider = await ApiCourseProviders(courseFound.UKPRN);
           setCourseProvider(getCourseProvider)
           setLoading(false)
-          setLoading$(false)
+          // setLoading$(false)
         } else {
 
           if (courseProviders !== null) {
@@ -217,7 +217,6 @@ const Page = () => {
                   </div>
                 } />
               </div>
-
               <a href="#" onClick={handleGoBack} title="link title" target="_self" className="wmcads-link"><span>&lt; Back to results</span></a>
             </div>
             <aside class="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
@@ -237,6 +236,8 @@ const Course = (props) => {
     courseName$.subscribe(name => {
       setCourseName(name);
     })
+
+    console.log(courseName, 'courseName$')
 
   }, [courseName]); 
 
