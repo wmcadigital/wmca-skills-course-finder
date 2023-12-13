@@ -19,7 +19,7 @@ const Page = () => {
   const [getCourse, setGetCourse] = useState([]);
   const [courseProvider, setCourseProvider] = useState([]);
   const [accordionData, setAccordionData] = useState(undefined);
-  const [loading, setLoading] = useState(null);
+  const [loading, setLoading] = useState(undefined);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
 
@@ -46,11 +46,12 @@ const Page = () => {
         // Check if dataValue is null and make an API call if needed
         if (course === null) {
           setLoading(true)
-          setLoading$(true)
+          // setLoading$(true)
           const course = await ApiCourse(courseId);
 
           const courseFound = findCourse(course, startDate, durationValue, locationName)
           setGetCourse(courseFound)
+          console.log(courseFound.CourseName, 'not stored')
           courseName$.next(courseFound.CourseName)
 
           const accData = setupAccordionData(courseFound)
@@ -59,17 +60,18 @@ const Page = () => {
           const getCourseProvider = await ApiCourseProviders(courseFound.UKPRN);
           setCourseProvider(getCourseProvider)
           setLoading(false)
-          setLoading$(false)
+          // setLoading$(false)
         } else {
 
           if (courseProviders !== null) {
             setCourseProvider(courseProviders)
           }
 
+          courseName$.next(course.CourseName)
+          console.log(course.CourseName, 'when stored')
           const accData = setupAccordionData(course)
           setAccordionData(accData)
           setGetCourse(course);
-          courseName$.next(course.CourseName)
 
         }
 
@@ -217,7 +219,6 @@ const Page = () => {
                   </div>
                 } />
               </div>
-
               <a href="#" onClick={handleGoBack} title="link title" target="_self" className="wmcads-link"><span>&lt; Back to results</span></a>
             </div>
             <aside class="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
@@ -229,7 +230,7 @@ const Page = () => {
   );
 };
 
-const Course = (props) => {
+const Course = () => {
   const [courseName, setCourseName] = useState(undefined);
 
   useEffect(() => {
@@ -237,6 +238,8 @@ const Course = (props) => {
     courseName$.subscribe(name => {
       setCourseName(name);
     })
+
+    console.log(courseName, 'courseName$')
 
   }, [courseName]); 
 
