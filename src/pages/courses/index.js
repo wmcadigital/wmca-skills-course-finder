@@ -262,6 +262,8 @@ const Page = () => {
       try {
         const courseProvider = await ApiCourseProviders(course.UKPRN);
         setCourseProviders$(courseProvider)
+        navigate(`/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`);
+        // Redirect to the details page
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -269,8 +271,6 @@ const Page = () => {
 
     fetchProviders();
     
-    // Redirect to the details page
-    navigate(`/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`);
   };
 
   const handleCheckboxChange = (accordionIndex, checkboxIndex) => {
@@ -656,7 +656,7 @@ const Page = () => {
                 </a>
               </div>
               {accordionData.map((accordion, index) => (
-                <AccordionComponent key={index} data={accordion} index={index} ChildComponent={<CheckboxComponent options={accordion.checkbox} accordionIndex={index} onCheckboxChange={handleCheckboxChange} />} />
+                <AccordionComponent key={index} data={accordion} ChildComponent={<CheckboxComponent options={accordion.checkbox} accordionIndex={index} onCheckboxChange={handleCheckboxChange} />} />
               ))}
             {filterIsModified && <div class="wmcads-container wmcads-hide-desktop" onClick={toggleMobileFilters}><button class="wmcads-btn wmcads-btn--primary wmcads-btn--block" id="show_filter_btn" aria-controls="search_filter" aria-expanded="false">Apply fliters</button></div>}
               {filterIsModified &&

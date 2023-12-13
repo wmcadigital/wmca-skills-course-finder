@@ -40,7 +40,7 @@ const Accordion = ({ChildComponent, title, isOpenByDefault, index }) => {
 const AccordionComponent = ({ ChildComponent, data }) => {
   return (
     <>
-      <Accordion ChildComponent={ChildComponent} title={data.title} index={data.index} isOpenByDefault={false} />
+      <Accordion ChildComponent={ChildComponent} title={data.title} index={data.index} isOpenByDefault={data.isOpen} />
     </>
   );
 };

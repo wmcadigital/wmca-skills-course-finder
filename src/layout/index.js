@@ -7,7 +7,7 @@ const AppLayout = (WrappedComponent, { breadCrumb }) => {
   return (props) => (
     <div>
       <Header />
-      <div className="wmcads-container">
+      <div className={`wmcads-container`}>
         <Breadcrumbs breadCrumb={ breadCrumb } />
       </div>
       <main className="wmcads-container wmcads-container--main">

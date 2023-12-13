@@ -14,7 +14,6 @@ const ApiCourse = async (id) => {
     console.log(response.status, response.statusText);
   } else {
     const data = await response.json();
-    console.log(data.Table1, 'course')
     return data.Table1;
   }
 };

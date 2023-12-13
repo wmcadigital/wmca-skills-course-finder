@@ -2,7 +2,7 @@ import React from 'react';
 
 const CheckboxComponent = ({ options, accordionIndex, onCheckboxChange }) => {
   return (
-    <div className="wmcads-accordion__content" id="accordion-Date">
+    <div className="wmcads-accordion__content" id={`accordion-Date-${accordionIndex}`}>
       <fieldset className="wmcads-fe-fieldset">
         <div className="wmcads-fe-checkboxes">
           {options.map((option, checkboxIndex) => (
