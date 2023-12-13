@@ -234,8 +234,6 @@ const Course = () => {
       setCourseName(name);
     })
 
-    console.log(courseName, 'courseName$')
-
   }, []); 
 
   const breadCrumb = [
