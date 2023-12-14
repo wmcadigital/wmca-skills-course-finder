@@ -2,15 +2,15 @@ import React, { StrictMode } from 'react';
 import {createRoot} from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import { RouterProvider, createBrowserRouter, Navigate, createHashRouter, Route, createRoutesFromElements } from "react-router-dom";
+import { RouterProvider, Navigate, createHashRouter} from "react-router-dom";
 import Courses from './pages/courses';
 import Course from './pages/course';
+import Pag from './pages/pag';
 
 const container = document.getElementById("root");
 const root = createRoot(container);
 
 const router = createHashRouter([
-// const router = createBrowserRouter([
   {
     path: '/',
     element: <Navigate to = "/course-finder" />,
@@ -22,7 +22,10 @@ const router = createHashRouter([
   {
     path: "/course-finder/details",
     element: <Course />,
-    // loader: courseLoader,
+  },
+  {
+    path: "/pag",
+    element: <Pag />,
   },
 ]);
 

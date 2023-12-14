@@ -154,6 +154,9 @@ const Page = () => {
       try {
         setLoading(true);
         const data = await apiCoursesService.getData();
+        data.map(val => {
+          console.log(val.CourseDescription, 'course description')
+        })
         setLoading(false);
         setGetCourses(data); 
         setCourses(data); 
@@ -178,6 +181,15 @@ const Page = () => {
 
     // Use replaceState to prevent adding a new entry to the history stack
     window.history.replaceState({}, '', `#/course-finder?${newSearchParams.toString()}`);
+
+    const timeoutScroll = setTimeout(() => {
+      ScrollToTop();
+    }, 500);
+
+    return () => {
+      clearTimeout(timeoutScroll);
+    };
+
   }, [currentPage, filter]);
 
   useEffect(() => {
@@ -237,10 +249,11 @@ const Page = () => {
       coursesFiltered = sortCourses(coursesFiltered, filter.sort)
     }
 
-      setCourses(coursesFiltered)
-      setCoursesCount(coursesFiltered.length);
+    setCourses(coursesFiltered)
+    setCoursesCount(coursesFiltered.length);
 
   }, [filter, getCourses]);
+
 
   const selectionHandle = (event, selection) => {
     const value = event.target.value;
@@ -303,7 +316,7 @@ const Page = () => {
     const currentCourseItems = courses.slice(startIndex, endIndex);
 
     if (coursesCount > 1) {
-      return (<p class="course-count">Showing 1 to {currentCourseItems.length} of <strong>{coursesCount}</strong> courses</p>)
+      return (<p class="course-count">{`Showing ${startIndex + 1} to ${endIndex} of `}<strong>{`${courses.length}`}</strong> courses</p>)
       // return (<p class="load-block"></p>)
     } else if (coursesCount === 1) {
     } else if (loading) {
@@ -372,7 +385,7 @@ const Page = () => {
             onChange={e => selectionHandle(e, 'startDate')} // Set the event handler for dropdown changes
           >
             <option value="">Anytime</option>
-            <option value="New 3 months">New 3 months</option>
+            <option value="Next 3 months">Next 3 months</option>
             <option value="In 3 to 6 months">In 3 to 6 months</option>
             <option value="More than 6 months">More than 6 months</option>
           </select>
@@ -405,6 +418,9 @@ const Page = () => {
     )
   }
 
+  const ScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
 
   const handleNextPage = (e) => {
     e.preventDefault();
@@ -420,6 +436,7 @@ const Page = () => {
     e.preventDefault();
     setCurrentPage(page);
   };
+
 
   const generatePageIndexPagination = () => {
     const Li = [];
@@ -530,7 +547,7 @@ const Page = () => {
             currentCourseItems.map((course, index) => (
               <div key={index} className="wmcads-search-result">
                 <h2 className="wmcads-m-b-none">
-                  <a href="#" onClick={(e) => courseDetailsLink(e, course)} className="h2 wmcads-search-result__title">
+                  <a href={`/#/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`} onClick={(e) => courseDetailsLink(e, course)} className="h2 wmcads-search-result__title">
                     {course.CourseName}
                   </a>
                 </h2>
@@ -588,7 +605,7 @@ const Page = () => {
   return (
     <div class="template-search">
       <div class="wmcads-m-b-lg">
-        <h1 id="wmcads-main-content">Find courses for jobs</h1>
+        <h1 id="wmcads-main-content">Find a funded course for adults in the West Midlands</h1>
         <div class="wmcads-col-1 wmcads-col-md-2-3 wmcads-p-r-xl wmcads-p-r-sm-none">
           <form id="searchBar_form" class="wmcads-search-bar">
             <input id="searchBar_input" aria-label="Search" type="text" value={filter.searchTerm} class="wmcads-search-bar__input wmcads-fe-input" placeholder="Search course title or subject..." onChange={(e) => setFilter((prevFilter) => ({
@@ -653,7 +670,7 @@ const Page = () => {
                 <a href="#" id="hide_filter_btn" class="wmcads-search-filter__close" onClick={toggleMobileFilters}>
                   <svg>
                     <title>Close</title>
-                    <use href="#wmcads-general-cross" href="#wmcads-general-cross"></use>
+                    <use href="#wmcads-general-cross"></use>
                   </svg>
                 </a>
               </div>

@@ -188,6 +188,18 @@ const Page = () => {
                   </tr>
                 </tbody>
               </table>
+
+              {
+                getCourse.CourseDescription && (
+                  <>
+                    <h2>Course description</h2>
+                    <p>
+                      {getCourse.CourseDescription}
+                    </p>
+                  </>
+                )
+              }
+
               <div class="wmcads-accordion-wrapper">
                 <AccordionComponent data={{ title: 'Entry requirements', index: 1, isOpen: true }} ChildComponent={
                   <div className="wmcads-accordion__content">
