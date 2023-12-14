@@ -154,9 +154,6 @@ const Page = () => {
       try {
         setLoading(true);
         const data = await apiCoursesService.getData();
-        data.map(val => {
-          console.log(val.CourseDescription, 'course description')
-        })
         setLoading(false);
         setGetCourses(data); 
         setCourses(data); 
