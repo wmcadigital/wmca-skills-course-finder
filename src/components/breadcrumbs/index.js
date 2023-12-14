@@ -29,6 +29,16 @@ const Breadcrumbs = ({ breadCrumb }) => {
             Home
           </Link>
         </li>
+        <li className="wmcads-breadcrumb__list-item">
+          <Link to="/what-we-do/" className="wmcads-breadcrumb__link">
+            What we do
+          </Link>
+        </li>
+        <li className="wmcads-breadcrumb__list-item">
+          <Link to="/what-we-do/productivity-and-skills/" className="wmcads-breadcrumb__link">
+            Productivity and Skills
+          </Link>
+        </li>
         {generateBreadcrumbLinks()}
       </ol>
     </nav>
