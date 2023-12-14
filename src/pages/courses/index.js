@@ -10,6 +10,7 @@ import { setCourseProviders$ } from '../../services/rxjsStoreCourseProviders'
 import ApiCourseProviders from '../../services/apiCourseProviders'
 import { setCourseName$ } from '../../services/rxjsStoreCourseName'
 
+
 const itemsPerPage = 10;
 const maxIndexButtons = 5;
 
@@ -75,6 +76,7 @@ const filterCoursesByStartDate = (courses, startBy) => {
 }
 
 const Page = () => {
+
   const navigate = useNavigate();
   const [isOpenMobileFilters, setIsOpenMobileFilters] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
@@ -544,7 +546,7 @@ const Page = () => {
             currentCourseItems.map((course, index) => (
               <div key={index} className="wmcads-search-result">
                 <h2 className="wmcads-m-b-none">
-                  <a href={`/#/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}&newTab=true`} onClick={(e) => courseDetailsLink(e, course)} className="h2 wmcads-search-result__title">
+                  <a href={`/what-we-do/productivity-and-skills/course-finder/#/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}&newTab=true`} onClick={(e) => courseDetailsLink(e, course)} className="h2 wmcads-search-result__title">
                     {course.CourseName}
                   </a>
                 </h2>
