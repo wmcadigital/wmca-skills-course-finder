@@ -18,6 +18,7 @@ const Page = () => {
   const [courseProvider, setCourseProvider] = useState([]);
   const [accordionData, setAccordionData] = useState(undefined);
   const [loading, setLoading] = useState(undefined);
+  const [hideBackToResultsBtn, setHideBackToResultsBtn] = useState(false);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
 
@@ -25,6 +26,7 @@ const Page = () => {
   const startDate = queryParams.get('startDate');
   const locationName = queryParams.get('locationName');
   const durationValue = queryParams.get('durationValue');
+  const newTab = queryParams.get('newTab');
 
   useEffect(() => {
     const handleResize = () => {
@@ -39,6 +41,7 @@ const Page = () => {
   }, []); // Empty dependency array ensures that this effect runs once
 
   useEffect(() => {
+    setHideBackToResultsBtn(typeof newTab === 'string')
     const subscription = combineLatest([course$, courseProviders$]).subscribe(async ([course, courseProviders]) => {
       try {
         // Check if dataValue is null and make an API call if needed
@@ -54,9 +57,9 @@ const Page = () => {
           const accData = setupAccordionData(courseFound)
           setAccordionData(accData)
 
+          setLoading(false)
           const getCourseProvider = await ApiCourseProviders(courseFound.UKPRN);
           setCourseProvider(getCourseProvider)
-          setLoading(false)
           // setLoading$(false)
         } else {
 
@@ -226,7 +229,7 @@ const Page = () => {
                   </div>
                 } />
               </div>
-              <a href="#" onClick={handleGoBack} title="link title" target="_self" className="wmcads-link"><span>&lt; Back to results</span></a>
+              {!hideBackToResultsBtn && <a href="#" onClick={handleGoBack} title="link title" target="_self" className="wmcads-link"><span>&lt; Back to results</span></a>}
             </div>
             <aside class="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
               {!isMobile && providerDetails(courseProvider)}

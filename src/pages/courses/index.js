@@ -544,7 +544,7 @@ const Page = () => {
             currentCourseItems.map((course, index) => (
               <div key={index} className="wmcads-search-result">
                 <h2 className="wmcads-m-b-none">
-                  <a href={`/#/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`} onClick={(e) => courseDetailsLink(e, course)} className="h2 wmcads-search-result__title">
+                  <a href={`/#/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}&newTab=true`} onClick={(e) => courseDetailsLink(e, course)} className="h2 wmcads-search-result__title">
                     {course.CourseName}
                   </a>
                 </h2>
