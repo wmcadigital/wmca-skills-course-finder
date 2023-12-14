@@ -1,14 +1,16 @@
-import React from 'react';
-import { Link} from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
 const Breadcrumbs = ({ breadCrumb }) => {
-  
   const generateBreadcrumbLinks = () => {
     return breadCrumb.map((segment, index) => {
       return (
         <li key={index} className="wmcads-breadcrumb__list-item">
           {segment.path === undefined ? (
-            <span className="wmcads-breadcrumb__link wmcads-breadcrumb__link--current" aria-current="page">
+            <span
+              className="wmcads-breadcrumb__link wmcads-breadcrumb__link--current"
+              aria-current="page"
+            >
               {segment.name}
             </span>
           ) : (
@@ -25,19 +27,25 @@ const Breadcrumbs = ({ breadCrumb }) => {
     <nav aria-label="Breadcrumbs" className="wmcads-breadcrumb">
       <ol className="wmcads-breadcrumb__list">
         <li className="wmcads-breadcrumb__list-item">
-          <Link to="/" className="wmcads-breadcrumb__link">
+          <a href="https://www.wmca.org.uk" className="wmcads-breadcrumb__link">
             Home
-          </Link>
+          </a>
         </li>
         <li className="wmcads-breadcrumb__list-item">
-          <Link to="/what-we-do/" className="wmcads-breadcrumb__link">
+          <a
+            href="https://www.wmca.org.uk/what-we-do/"
+            className="wmcads-breadcrumb__link"
+          >
             What we do
-          </Link>
+          </a>
         </li>
         <li className="wmcads-breadcrumb__list-item">
-          <Link to="/what-we-do/productivity-and-skills/" className="wmcads-breadcrumb__link">
+          <a
+            href="https://www.wmca.org.uk/what-we-do/productivity-and-skills/"
+            className="wmcads-breadcrumb__link"
+          >
             Productivity and Skills
-          </Link>
+          </a>
         </li>
         {generateBreadcrumbLinks()}
       </ol>
