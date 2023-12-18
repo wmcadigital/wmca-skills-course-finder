@@ -5,7 +5,6 @@ import reportWebVitals from './reportWebVitals';
 import { RouterProvider, Navigate, createHashRouter} from "react-router-dom";
 import Courses from './pages/courses';
 import Course from './pages/course';
-import Pag from './pages/pag';
 
 const container = document.getElementById("root");
 const root = createRoot(container);
@@ -13,7 +12,7 @@ const root = createRoot(container);
 const router = createHashRouter([
   {
     path: '/',
-    element: <Navigate to = "/course-finder" />,
+    element: <Navigate to = "/course-finder"/>,
   },
   {
     path: "/course-finder",
@@ -22,10 +21,6 @@ const router = createHashRouter([
   {
     path: "/course-finder/details",
     element: <Course />,
-  },
-  {
-    path: "/pag",
-    element: <Pag />,
   },
 ]);
 

@@ -86,8 +86,8 @@ const Page = () => {
 
   const loader = () => {
     return (
-      <div class="wmcads-loader wmcads-loader--large" role="alert" aria-live="assertive">
-        <p class="wmcads-loader__content">Content is loading...</p>
+      <div className="wmcads-loader wmcads-loader--large" role="alert" aria-live="assertive">
+        <p className="wmcads-loader__content">Content is loading...</p>
       </div>
     )
   }
@@ -136,8 +136,8 @@ const Page = () => {
 
   const providerDetails = (courseProvider) => {
     return (
-      <div class="wmcads-content-card wmcads-m-b-lg">
-        <div class="wmcads-p-sm">
+      <div className="wmcads-content-card wmcads-m-b-lg">
+        <div className="wmcads-p-sm">
           {/* {accordionData} */}
           <h2>Course provider</h2>
           <p><strong>{courseProvider.CourseProvider}</strong></p>
@@ -159,35 +159,35 @@ const Page = () => {
               <h1 id="wmcads-main-content">{getCourse.CourseName}</h1>
               {isMobile && providerDetails(courseProvider)}
               <h2>Course details</h2>
-              <table class="wmcads-table wmcads-m-b-xl wmcads-table--without-header">
+              <table className="wmcads-table wmcads-m-b-xl wmcads-table--without-header">
                 <tbody>
                   <tr>
-                    <th scope="row" class="" data-header="Header 1">Qualification name</th>
-                    <td class="" data-header="Header 2">{getCourse.CourseName}</td>
+                    <th scope="row" data-header="Header 1">Qualification name</th>
+                    <td data-header="Header 2">{getCourse.CourseName}</td>
                   </tr>
                   <tr>
-                    <th scope="row" class="" data-header="Header 1">Qualification level</th>
-                    <td class="" data-header="Header 2">{getCourse.NotionalNVQLevel}</td>
+                    <th scope="row" data-header="Header 1">Qualification level</th>
+                    <td data-header="Header 2">{getCourse.NotionalNVQLevel}</td>
                   </tr>
                   <tr>
-                    <th scope="row" class="" data-header="Header 1">Awarding organisation</th>
-                    <td class="" data-header="Header 2">{getCourse.AwardOrgName}</td>
+                    <th scope="row" data-header="Header 1">Awarding organisation</th>
+                    <td data-header="Header 2">{getCourse.AwardOrgName}</td>
                   </tr>
                   <tr>
-                    <th scope="row" class="" data-header="Header 1">Course type</th>
-                    <td class="" data-header="Header 2">{getCourse.DeliverModeType}</td>
+                    <th scope="row" data-header="Header 1">Course type</th>
+                    <td data-header="Header 2">{getCourse.DeliverModeType}</td>
                   </tr>
                   <tr>
-                    <th scope="row" class="" data-header="Header 1">Course hours</th>
-                    <td class="" data-header="Header 2">{getCourse.StudyModeType}</td>
+                    <th scope="row" data-header="Header 1">Course hours</th>
+                    <td data-header="Header 2">{getCourse.StudyModeType}</td>
                   </tr>
                   <tr>
-                    <th scope="row" class="" data-header="Header 1">Course start date</th>
-                    <td class="" data-header="Header 2">{startDateFn(getCourse.StartDate)}</td>
+                    <th scope="row" data-header="Header 1">Course start date</th>
+                    <td data-header="Header 2">{startDateFn(getCourse.StartDate)}</td>
                   </tr>
                   <tr>
-                    <th scope="row" class="" data-header="Header 1">Costs</th>
-                    <td class="" data-header="Header 2">{getCourse.CostDescription}</td>
+                    <th scope="row" data-header="Header 1">Costs</th>
+                    <td data-header="Header 2">{getCourse.CostDescription}</td>
                   </tr>
                 </tbody>
               </table>
@@ -197,13 +197,13 @@ const Page = () => {
                   <>
                     <h2>Course description</h2>
                     <p>
-                      {getCourse.CourseDescription}
+                      <div dangerouslySetInnerHTML={{ __html: getCourse.CourseDescription }}></div>
                     </p>
                   </>
                 )
               }
 
-              <div class="wmcads-accordion-wrapper">
+              <div className="wmcads-accordion-wrapper">
                 <AccordionComponent data={{ title: 'Entry requirements', index: 1, isOpen: true }} ChildComponent={
                   <div className="wmcads-accordion__content">
                     <p>
@@ -213,7 +213,7 @@ const Page = () => {
                 } />
                 <AccordionComponent data={{ title: 'Location address', index: 1, isOpen: true }} ChildComponent={
                   <div className="wmcads-accordion__content">
-                    <div class="wmcads-inset-text" >
+                    <div className="wmcads-inset-text" >
                       {accordionData?.LocationInfo?.LocationName}
                       <br />
                       {accordionData?.LocationInfo?.LocationAddressOne}
@@ -231,7 +231,7 @@ const Page = () => {
               </div>
               {!hideBackToResultsBtn && <a href="#" onClick={handleGoBack} title="link title" target="_self" className="wmcads-link"><span>&lt; Back to results</span></a>}
             </div>
-            <aside class="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
+            <aside className="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
               {!isMobile && providerDetails(courseProvider)}
             </aside>
           </>

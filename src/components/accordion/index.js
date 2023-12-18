@@ -48,7 +48,7 @@ const AccordionComponent = ({ ChildComponent, data }) => {
 
 AccordionComponent.propTypes = {
   content: PropTypes.string,
-  data: PropTypes.array,
+  data: PropTypes.object,
   isOpenByDefault: PropTypes.bool,
 };
 

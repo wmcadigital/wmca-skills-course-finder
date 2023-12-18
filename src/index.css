@@ -135,3 +135,21 @@ code {
   gap: 20px;
   margin-bottom: 40px;
 }
+
+.mobile-sticky-btn {
+  position: sticky;
+  z-index: 100;
+  top: 0;
+  /* border: 1px solid red; */
+  padding: 10px;
+  margin: -10px;
+  background: #f3f2f1;
+  position: -webkit-sticky;
+}
+
+.sticky-aside {
+  z-index: 101;
+  top: 0;
+  position: sticky;
+  position: -webkit-sticky;
+}

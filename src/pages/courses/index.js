@@ -139,6 +139,19 @@ const Page = () => {
     searchTerm: ''
   };
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const data = await apiCoursesService.getData();
+      setLoading(false);
+      setGetCourses(data);
+      setCourses(data);
+      setCoursesCount(data.length);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }; 
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 767);
@@ -152,19 +165,6 @@ const Page = () => {
   }, []); // Empty dependency array ensures that this effect runs once
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const data = await apiCoursesService.getData();
-        setLoading(false);
-        setGetCourses(data); 
-        setCourses(data); 
-        setCoursesCount(data.length); 
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    
     fetchData();
   }, []); // The empty dependency array means this effect runs once after the initial render
 
@@ -181,15 +181,12 @@ const Page = () => {
     // Use replaceState to prevent adding a new entry to the history stack
     window.history.replaceState({}, '', `#/course-finder?${newSearchParams.toString()}`);
 
-    const timeoutScroll = setTimeout(() => {
-      ScrollToTop();
-    }, 500);
-
-    return () => {
-      clearTimeout(timeoutScroll);
-    };
-
   }, [currentPage, filter]);
+
+
+  useEffect(() => {
+    ScrollToTop()
+  }, [currentPage]);
 
   useEffect(() => {
 
@@ -263,8 +260,8 @@ const Page = () => {
   };
 
   const toggleMobileFilters = (e) => {
-    e.preventDefault()
     setIsOpenMobileFilters(!isOpenMobileFilters)
+    e.preventDefault()
   }
 
   const courseDetailsLink = (e, course) => {
@@ -312,16 +309,15 @@ const Page = () => {
   const coursesCountAmount = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, courses.length);
-    const currentCourseItems = courses.slice(startIndex, endIndex);
 
     if (coursesCount > 1) {
-      return (<p class="course-count">{`Showing ${startIndex + 1} to ${endIndex} of `}<strong>{`${courses.length}`}</strong> courses</p>)
-      // return (<p class="load-block"></p>)
+      return (<p className="course-count">{`Showing ${startIndex + 1} to ${endIndex} of `}<strong>{`${courses.length}`}</strong> courses</p>)
+      // return (<p className="load-block"></p>)
     } else if (coursesCount === 1) {
     } else if (loading) {
-      return (<p class="load-block pulse"></p>)
+      return (<p className="load-block pulse"></p>)
     } else if (coursesCount === 0) {
-      return (<p class="course-count"><strong>{coursesCount}</strong> results found</p>)
+      return (<p className="course-count"><strong>{coursesCount}</strong> results found</p>)
     }
 
   }
@@ -350,18 +346,18 @@ const Page = () => {
     return (
       <div className="course-count-sort-by-wrapper">
         {coursesCountAmount()}
-        <label class="wmcads-fe-label" for="dropdown">
+        <label className="wmcads-fe-label" htmlFor="sort">
           <h4>Sort by</h4>
         </label>
-        <div class="wmcads-fe-dropdown">
+        <div className="wmcads-fe-dropdown">
           <select
-            class="wmcads-fe-dropdown__select"
+            className="wmcads-fe-dropdown__select"
             id="sort"
             name="sort"
             value={filter.sort} // Set the value of the dropdown to the state variable
             onChange={e => selectionHandle(e, 'sort')} // Set the event handler for dropdown changes
             >
-            <option value="" selected="selected">Relevance</option>
+            <option value="">Relevance</option>
             <option value="Start date">Start date</option>
           </select>
         </div>
@@ -371,11 +367,11 @@ const Page = () => {
 
   const searchByStartDate = () => {
     return (
-      <div class="wmcads-search-sort wmcads-fe-group">
-        <label class="wmcads-fe-label" for="dropdown">
+      <div className="wmcads-search-sort wmcads-fe-group">
+        <label className="wmcads-fe-label" htmlFor="startDate">
           <h3>Start date</h3>
         </label>
-        <div class="wmcads-fe-dropdown">
+        <div className="wmcads-fe-dropdown">
           <select
             className="wmcads-fe-dropdown__select"
             id="startDate"
@@ -395,20 +391,20 @@ const Page = () => {
 
   const countSortByMobile = () => {
     return (
-      <div class="wmcads-search-sort wmcads-fe-group">
-        <label class="wmcads-fe-label" for="dropdown">
+      <div className="wmcads-search-sort wmcads-fe-group">
+        <label className="wmcads-fe-label" htmlFor="sort2">
           <h3>Sort by</h3>
         </label>
-        <div class="wmcads-fe-dropdown">
-          <div class="wmcads-fe-dropdown">
+        <div className="wmcads-fe-dropdown">
+          <div className="wmcads-fe-dropdown">
             <select
-              class="wmcads-fe-dropdown__select"
-              id="sort"
-              name="sort"
+              className="wmcads-fe-dropdown__select"
+              id="sort2"
+              name="sort2"
               value={filter.sort} // Set the value of the dropdown to the state variable
               onChange={e => selectionHandle(e, 'sort')} // Set the event handler for dropdown changes
             >
-              <option value="" selected="selected">Relevance</option>
+              <option value="">Relevance</option>
               <option value="Start date">Start date</option>
             </select>
           </div>
@@ -418,7 +414,10 @@ const Page = () => {
   }
 
   const ScrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    });
+
   }
 
   const handleNextPage = (e) => {
@@ -455,7 +454,7 @@ const Page = () => {
           {1 === currentPage ? (
             1
           ) : (
-            <a onClick={(e) => handleJumpToPage(e, 1)} className="wmcads-link" href="#">
+            <a onClick={(e) => handleJumpToPage(e, 1)} className="wmcads-link">
               1
             </a>
           )}
@@ -477,7 +476,7 @@ const Page = () => {
           {i === currentPage ? (
             i
           ) : (
-            <a onClick={(e) => handleJumpToPage(e, i)} className="wmcads-link" href="#">
+            <a onClick={(e) => handleJumpToPage(e, i)} className="wmcads-link">
               {i}
             </a>
           )}
@@ -499,7 +498,7 @@ const Page = () => {
           {totalPagesForcourses === currentPage ? (
             totalPagesForcourses
           ) : (
-              <a onClick={(e) => handleJumpToPage(e, totalPagesForcourses)} className="wmcads-link" href="#">
+              <a onClick={(e) => handleJumpToPage(e, totalPagesForcourses)} className="wmcads-link">
                 {totalPagesForcourses}
             </a>
           )}
@@ -531,8 +530,8 @@ const Page = () => {
   const CoursesFound = (currentCourseItems) => {
     const contentLoad = Array.from({ length: 5 }, (_, index) => (
       <div className="load-wrapper" key={index}>
-        <div class="loader-title pulse"></div>
-        <div class="loader-content pulse"></div>
+        <div className="loader-title pulse"></div>
+        <div className="loader-content pulse"></div>
       </div>
     ));
     return (
@@ -602,16 +601,16 @@ const Page = () => {
   };
 
   return (
-    <div class="template-search">
-      <div class="wmcads-m-b-lg">
+    <div className="template-search">
+      <div className="wmcads-m-b-lg">
         <h1 id="wmcads-main-content">Find a funded course for adults in the West Midlands</h1>
-        <div class="wmcads-col-1 wmcads-col-md-2-3 wmcads-p-r-xl wmcads-p-r-sm-none">
-          <form id="searchBar_form" class="wmcads-search-bar">
-            <input id="searchBar_input" aria-label="Search" type="text" value={filter.searchTerm} class="wmcads-search-bar__input wmcads-fe-input" placeholder="Search course title or subject..." onChange={(e) => setFilter((prevFilter) => ({
+        <div className="wmcads-col-1 wmcads-col-md-2-3 wmcads-p-r-xl wmcads-p-r-sm-none">
+          <form id="searchBar_form" className="wmcads-search-bar">
+            <input id="searchBar_input" aria-label="Search" type="text" value={filter.searchTerm} className="wmcads-search-bar__input wmcads-fe-input" placeholder="Search course title or subject..." onChange={(e) => setFilter((prevFilter) => ({
               ...prevFilter,
               searchTerm: e.target.value,
             }))} />
-              <button class="wmcads-search-bar__btn" type="submit" onClick={(e) => e.preventDefault()}>
+              <button className="wmcads-search-bar__btn" type="submit" onClick={(e) => e.preventDefault()}>
                 <svg>
                   <title>Search</title>
                   <use xlinkHref="#wmcads-general-search" href="#wmcads-general-search"></use>
@@ -620,15 +619,15 @@ const Page = () => {
           </form>
         </div>
       </div>
-      <div class="wmcads-grid">
-        <div class="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none">
+      <div className="wmcads-grid">
+        <div className="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none">
             {!isMobile && countSortBy()}
           <div style={{paddingBottom: '20px'}}>
             {isMobile &&  coursesCountAmount() }
           </div>
           {isMobile && countSortByMobile()}
           {isMobile && searchByStartDate()}
-          <div class="wmcads-hide-desktop" onClick={toggleMobileFilters}><button class="wmcads-btn wmcads-btn--primary wmcads-btn--block" id="show_filter_btn" aria-controls="search_filter" aria-expanded="false">Filter your results</button></div>
+          <div className="wmcads-hide-desktop mobile-sticky-btn" onClick={toggleMobileFilters}><button className="wmcads-btn wmcads-btn--primary wmcads-btn--block" id="show_filter_btn" aria-controls="search_filter" aria-expanded="false">Filter your results</button></div>
           {CoursesFound(currentCourseItems)}
           <div className="wmcads-pagination wmcads-m-t-xl">
             {currentPage > 1 && (
@@ -650,23 +649,24 @@ const Page = () => {
               {generatePageIndexPagination()}
             </ol>
             {currentCourseItems.length === 10 && !loading &&
-              <a onClick={handleNextPage} href="#" target="_self" class="wmcads-pagination__next wmcads-link wmcads-link--with-chevron">
+              <a onClick={handleNextPage} href="#" target="_self" className="wmcads-pagination__next wmcads-link wmcads-link--with-chevron">
                 Next page
-                <svg class="wmcads-link__chevron wmcads-link__chevron--right">
+                <svg className="wmcads-link__chevron wmcads-link__chevron--right">
                   <use href="#wmcads-general-chevron-right" href="#wmcads-general-chevron-right"></use>
                 </svg>
               </a>
             }
           </div>
         </div>
-        <aside class="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
-          <hr class="wmcads-hide-desktop"/>
+        <aside className="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
+          <div className="sticky-aside">
+          <hr className="wmcads-hide-desktop"/>
           {!isMobile && searchByStartDate() }
-          <div id="search_filter" class={`wmcads-search-filter ${isOpenMobileFilters ? 'open' : ''}`}>
-              <div class="wmcads-search-filter__header">
-                <h3 class="wmcads-search-filter__header-title">Filter</h3>
-                {filterIsModified && <a href="#" class="wmcads-hide-desktop wmcads-link wmcads-hide-desktop hide-desktop" onClick={clearFilters}>Clear all</a>}
-                <a href="#" id="hide_filter_btn" class="wmcads-search-filter__close" onClick={toggleMobileFilters}>
+          <div id="search_filter" className={`wmcads-search-filter ${isOpenMobileFilters ? 'open' : ''}`}>
+              <div className="wmcads-search-filter__header">
+                <h3 className="wmcads-search-filter__header-title">Filter</h3>
+                {filterIsModified && <a href="#" className="wmcads-hide-desktop wmcads-link wmcads-hide-desktop hide-desktop" onClick={clearFilters}>Clear all</a>}
+                <a href="#" id="hide_filter_btn" className="wmcads-search-filter__close" onClick={toggleMobileFilters}>
                   <svg>
                     <title>Close</title>
                     <use href="#wmcads-general-cross"></use>
@@ -676,7 +676,7 @@ const Page = () => {
               {accordionData.map((accordion, index) => (
                 <AccordionComponent key={index} data={accordion} ChildComponent={<CheckboxComponent options={accordion.checkbox} accordionIndex={index} onCheckboxChange={handleCheckboxChange} />} />
               ))}
-            {filterIsModified && <div class="wmcads-container wmcads-hide-desktop" onClick={toggleMobileFilters}><button class="wmcads-btn wmcads-btn--primary wmcads-btn--block" id="show_filter_btn" aria-controls="search_filter" aria-expanded="false">Apply fliters</button></div>}
+            {filterIsModified && <div className="wmcads-container wmcads-hide-desktop" onClick={toggleMobileFilters}><button className="wmcads-btn wmcads-btn--primary wmcads-btn--block" id="show_filter_btn" aria-controls="search_filter" aria-expanded="false">Apply fliters</button></div>}
               {filterIsModified &&
                 <a href="#"
                 className="wmcads-search-filter__clear-all wmcads-hide-mobile"
@@ -700,6 +700,7 @@ const Page = () => {
                 </a>
               }
             </div>
+          </div>
         </aside>
       </div>
     </div>
