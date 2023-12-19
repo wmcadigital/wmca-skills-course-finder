@@ -3,29 +3,79 @@ import AppLayout from '../../layout/index';
 import ApiCourse from '../../services/apiCourse'
 import ApiCourseProviders from '../../services/apiCourseProviders'
 import moment from 'moment';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { combineLatest } from 'rxjs';
-import { course$ } from '../../services/rxjsStoreCourse'
-import { courseProviders$ } from '../../services/rxjsStoreCourseProviders'
-import { setLoading$ } from '../../services/rxjsStoreLoading'
+import { useNavigate, useLocation, useLoaderData } from 'react-router-dom';
 import { setCourseName$, courseName$ } from '../../services/rxjsStoreCourseName'
 import AccordionComponent from '../../components/accordion'
 
+export async function ApiFetchCourseDetails({ request }) {
+  
+  const searchParams = new URLSearchParams(new URL(request.url).search);
+  // Get the value of the 'courseId' parameter
+  const courseId = searchParams.get("courseId");
+  const startDate = searchParams.get("startDate");
+  const durationValue = searchParams.get("durationValue");
+  const locationName = searchParams.get("locationName");
+
+  try {
+    const course = await ApiCourse(courseId);
+    const courseFound = findCourse(course, startDate, durationValue, locationName)
+    setCourseName$(courseFound.CourseName)
+    const getCourseProvider = await ApiCourseProviders(courseFound.UKPRN);
+
+    return { courseFound, getCourseProvider };
+
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+
+}
+
+export const findCourse = (courseArray, startDate, durationValue, locationName) => {
+  return courseArray.find(course => {
+    return (
+      course.StartDate === startDate &&
+      course.DurationValue === durationValue &&
+      course.LocationName === locationName
+    );
+  });
+}
+
+export const setupAccordionData = (course) => {
+  // Destructure the object to extract the desired properties
+  const { EntryRequirements, LocationName, LocationAddressOne, LocationAddressTwo, LocationCounty, LocationPostcode, LocationTelephone, LocationTown, LocationWebsite } = course;
+
+  // Create a new object with the extracted properties
+  return {
+    EntryRequirements,
+    LocationInfo: {
+      LocationName,
+      LocationAddressOne,
+      LocationAddressTwo,
+      LocationCounty,
+      LocationPostcode,
+      LocationTelephone,
+      LocationTown,
+      LocationWebsite
+    }
+  };
+}
+
 const Page = () => {
+  const courseInfo = useLoaderData();
+  const provider = courseInfo.getCourseProvider
+  const course = courseInfo.courseFound
+  const accData = setupAccordionData(course)
+
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
   const navigate = useNavigate();
-  const [getCourse, setGetCourse] = useState([]);
-  const [courseProvider, setCourseProvider] = useState([]);
-  const [accordionData, setAccordionData] = useState(undefined);
-  const [loading, setLoading] = useState(undefined);
+  const [getCourse] = useState(course || undefined);
+  const [courseProvider] = useState(provider || undefined);
+  const [accordionData] = useState(accData || undefined);
+  const [loading] = useState(undefined);
   const [hideBackToResultsBtn, setHideBackToResultsBtn] = useState(false);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
 
-  const courseId = queryParams.get('courseId');
-  const startDate = queryParams.get('startDate');
-  const locationName = queryParams.get('locationName');
-  const durationValue = queryParams.get('durationValue');
   const newTab = queryParams.get('newTab');
 
   useEffect(() => {
@@ -42,46 +92,6 @@ const Page = () => {
 
   useEffect(() => {
     setHideBackToResultsBtn(typeof newTab === 'string')
-    const subscription = combineLatest([course$, courseProviders$]).subscribe(async ([course, courseProviders]) => {
-      try {
-        // Check if dataValue is null and make an API call if needed
-        if (course === null) {
-          setLoading(true)
-          // setLoading$(true)
-          const course = await ApiCourse(courseId);
-
-          const courseFound = findCourse(course, startDate, durationValue, locationName)
-          setGetCourse(courseFound)
-          setCourseName$(courseFound.CourseName)
-
-          const accData = setupAccordionData(courseFound)
-          setAccordionData(accData)
-
-          setLoading(false)
-          const getCourseProvider = await ApiCourseProviders(courseFound.UKPRN);
-          setCourseProvider(getCourseProvider)
-          // setLoading$(false)
-        } else {
-
-          if (courseProviders !== null) {
-            setCourseProvider(courseProviders)
-          }
-
-          const accData = setupAccordionData(course)
-          setAccordionData(accData)
-          setGetCourse(course);
-
-        }
-
-      } catch (error) {
-        console.error('Error fetching data from API:', error);
-      }
-    });
-
-    // Clean up the subscription on component unmount
-    return () => {
-      subscription.unsubscribe();
-    };
   }, []); // Empty dependency array ensures the effect runs once after the initial render
 
   const loader = () => {
@@ -103,36 +113,6 @@ const Page = () => {
     e.preventDefault()
     navigate(-1); // Navigate back one step
   };
-
-  const findCourse = (courseArray, startDate, durationValue, locationName) => {
-    return courseArray.find(course => {
-      return (
-        course.StartDate === startDate &&
-        course.DurationValue === durationValue &&
-        course.LocationName === locationName
-      );
-    });
-  }
-
-  const setupAccordionData = (course) => {
-    // Destructure the object to extract the desired properties
-    const { EntryRequirements, LocationName, LocationAddressOne, LocationAddressTwo, LocationCounty, LocationPostcode, LocationTelephone, LocationTown, LocationWebsite } = course;
-
-    // Create a new object with the extracted properties
-    return {
-      EntryRequirements,
-        LocationInfo: {
-          LocationName,
-          LocationAddressOne,
-          LocationAddressTwo,
-          LocationCounty,
-          LocationPostcode,
-          LocationTelephone,
-          LocationTown,
-          LocationWebsite
-      }
-    };
-  }
 
   const providerDetails = (courseProvider) => {
     return (

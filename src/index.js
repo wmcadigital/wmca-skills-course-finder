@@ -3,8 +3,8 @@ import {createRoot} from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { RouterProvider, Navigate, createHashRouter} from "react-router-dom";
-import Courses from './pages/courses';
-import Course from './pages/course';
+import Courses, { ApiFetchCourses } from './pages/courses';
+import Course, { ApiFetchCourseDetails } from './pages/course';
 
 const container = document.getElementById("root");
 const root = createRoot(container);
@@ -17,10 +17,12 @@ const router = createHashRouter([
   {
     path: "/course-finder",
     element: <Courses />,
+    loader: ApiFetchCourses,
   },
   {
     path: "/course-finder/details",
     element: <Course />,
+    loader: ApiFetchCourseDetails,
   },
 ]);
 

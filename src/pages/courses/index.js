@@ -4,11 +4,20 @@ import apiCoursesService from '../../services/apiCourses'
 import moment from 'moment';
 import AccordionComponent from '../../components/accordion'
 import CheckboxComponent from '../../components/checkbox'
-import { useLocation, useNavigate } from 'react-router-dom';
-import { setCourse$ } from '../../services/rxjsStoreCourse'
-import { setCourseProviders$ } from '../../services/rxjsStoreCourseProviders'
-import ApiCourseProviders from '../../services/apiCourseProviders'
-import { setCourseName$ } from '../../services/rxjsStoreCourseName'
+import { useLocation, useNavigate, useLoaderData } from 'react-router-dom';
+
+
+export async function ApiFetchCourses() {
+
+  try {
+    const courses = await apiCoursesService.getData();
+    return { courses };
+
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+
+}
 
 
 const itemsPerPage = 10;
@@ -76,13 +85,14 @@ const filterCoursesByStartDate = (courses, startBy) => {
 }
 
 const Page = () => {
+  const coursesCollection = useLoaderData();
 
   const navigate = useNavigate();
   const [isOpenMobileFilters, setIsOpenMobileFilters] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
-  const [courses, setCourses] = useState([]);
-  const [getCourses, setGetCourses] = useState([]);
-  const [coursesCount, setCoursesCount] = useState(0);
+  const [courses, setCourses] = useState(coursesCollection.courses || []);
+  const [getCourses, setGetCourses] = useState(coursesCollection.courses || []);
+  const [coursesCount, setCoursesCount] = useState(coursesCollection.courses.length || 0);
   const [accordionData, setAccordionData] = useState([
     {
       title: 'Course type', type: 'courseType', checkbox: [
@@ -139,18 +149,6 @@ const Page = () => {
     searchTerm: ''
   };
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const data = await apiCoursesService.getData();
-      setLoading(false);
-      setGetCourses(data);
-      setCourses(data);
-      setCoursesCount(data.length);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  }; 
 
   useEffect(() => {
     const handleResize = () => {
@@ -163,10 +161,6 @@ const Page = () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []); // Empty dependency array ensures that this effect runs once
-
-  useEffect(() => {
-    fetchData();
-  }, []); // The empty dependency array means this effect runs once after the initial render
 
   useEffect(() => {
     // Update the URL when the page or search term changes
@@ -266,22 +260,7 @@ const Page = () => {
 
   const courseDetailsLink = (e, course) => {
     e.preventDefault()
-    setCourse$(course)
-    setCourseName$(course.CourseName)
-    
-    const fetchProviders = async () => {
-      try {
-        const courseProvider = await ApiCourseProviders(course.UKPRN);
-        setCourseProviders$(courseProvider)
-        navigate(`/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`);
-        // Redirect to the details page
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchProviders();
-    
+    navigate(`/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`);
   };
 
   const handleCheckboxChange = (accordionIndex, checkboxIndex) => {
