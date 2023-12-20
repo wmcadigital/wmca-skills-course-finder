@@ -26,6 +26,7 @@ export async function ApiFetchCourseDetails({ request }) {
 
   } catch (error) {
     console.error('Error fetching data:', error);
+    return { courseFound: [], getCourseProvider: [] };
   }
 
 }
