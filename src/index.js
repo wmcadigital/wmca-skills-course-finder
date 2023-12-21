@@ -3,14 +3,19 @@ import {createRoot} from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { RouterProvider, Navigate, createHashRouter} from "react-router-dom";
-import Courses, { ApiFetchCourses } from './pages/courses';
-import Course, { ApiFetchCourseDetails } from './pages/course';
+import Courses from './pages/courses';
+import Course from './pages/course';
 import { openDB } from 'idb';
 
 openDB('coursesDB', 1, {
   upgrade(db) {
-    db.createObjectStore('courses');
-    db.createObjectStore('providers');
+    if (!db.objectStoreNames.contains('courses')) {
+      db.createObjectStore('courses');
+    }
+
+    if (!db.objectStoreNames.contains('providers')) {
+      db.createObjectStore('providers');
+    }
   },
 });
 

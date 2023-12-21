@@ -14,7 +14,7 @@ class ApiCourses {
         method: 'GET', // or 'POST' or other HTTP methods
       });
       const data = await response.json();
-      return data;
+      return data.Table1;
     } catch (error) {
       console.error('Error fetching data:', error);
       throw error;
