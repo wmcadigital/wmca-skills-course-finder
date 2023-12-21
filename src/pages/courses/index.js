@@ -7,7 +7,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { openDB } from 'idb';
 import apiCourseProviderStorage from '../../services/apiCourseProviderStorage'
 
-
 const itemsPerPage = 10;
 const maxIndexButtons = 5;
 
@@ -142,10 +141,9 @@ const Page = () => {
         const db = await openDB('coursesDB', 1);
         // Assuming 'courses' is the name of your object store
         const result = await db.get('courses', 'courses');
+        const storedCourses = JSON.parse(result);
+        setPageRequest(storedCourses)
         db.close();
-
-        const coursesData = JSON.parse(result);
-        setPageRequest(coursesData)
         // Check if the data is an array
       } catch (error) {
         apiCourseProviderStorage()
