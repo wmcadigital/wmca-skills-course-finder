@@ -145,13 +145,11 @@ const Page = () => {
         db.close();
 
         const coursesData = JSON.parse(result);
-        console.log(coursesData, 'STORE CALL')
         setPageRequest(coursesData)
         // Check if the data is an array
       } catch (error) {
         apiCourseProviderStorage()
         .then((result) => {
-          console.log(result.courses, 'NEW CALL')
             setPageRequest(result.courses)
           })
           .catch((error) => {

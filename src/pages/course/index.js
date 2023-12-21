@@ -98,8 +98,6 @@ const Page = () => {
         const coursesData = JSON.parse(result);
         const providersData = JSON.parse(result2);
 
-        console.log(coursesData)
-        console.log(providersData)
         setPageRequest(coursesData, providersData)
       } catch (error) {
         apiCourseProviderStorage()
