@@ -73,7 +73,10 @@ const filterCoursesByStartDate = (courses, startBy) => {
 }
 
 const Page = () => {
+  const hostname = window.location.hostname;
   console.log('Base URL:', window.location.hostname);
+
+
   const navigate = useNavigate();
   const [isOpenMobileFilters, setIsOpenMobileFilters] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
@@ -258,6 +261,13 @@ const Page = () => {
     setCoursesCount(coursesFiltered.length);
 
   }, [filter, getCourses]);
+
+  const newTabWindowLink = (course) => {
+    if (hostname === 'effervescent-tapioca-0ff2a1.netlify.app') {
+      return `/#/course-finder/details?courseId=${ course.CourseID }&locationName=${ course.LocationName }&startDate=${ course.StartDate }&durationValue=${ course.DurationValue }&newTab=true`
+    }
+    return `/what-we-do/productivity-and-skills/course-finder/#/course-finder/details?courseId=${ course.CourseID }&locationName=${ course.LocationName }&startDate=${ course.StartDate }&durationValue=${ course.DurationValue }&newTab=true`
+  }
 
 
   const selectionHandle = (event, selection) => {
@@ -553,7 +563,7 @@ const Page = () => {
             currentCourseItems.map((course, index) => (
               <div key={index} className="wmcads-search-result">
                 <h2 className="wmcads-m-b-none">
-                  <a href={`/what-we-do/productivity-and-skills/course-finder/#/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}&newTab=true`} onClick={(e) => courseDetailsLink(e, course)} className="h2 wmcads-search-result__title">
+                  <a href={newTabWindowLink(course)} onClick={(e) => courseDetailsLink(e, course)} className="h2 wmcads-search-result__title">
                     {course.CourseName}
                   </a>
                 </h2>
