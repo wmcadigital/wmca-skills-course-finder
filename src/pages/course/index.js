@@ -156,6 +156,16 @@ const Page = () => {
     navigate(-1); // Navigate back one step
   };
 
+
+  const updateContactPhone = (courseProvider) => {
+    if (courseProvider?.ContactPhone && !courseProvider.ContactPhone.startsWith('0')) {
+      return '0' + courseProvider.ContactPhone
+    }
+    else {
+      return courseProvider.ContactPhone
+    }
+  }
+
   const providerDetails = (courseProvider) => {
     return (
       <div className="wmcads-content-card wmcads-m-b-lg">
@@ -165,7 +175,7 @@ const Page = () => {
           <p><strong>{courseProvider?.CourseProvider}</strong></p>
           <p className="mtb-10"><strong>Website:</strong> <a className="wmcads-link" href={courseProvider?.Website} target="_blank" rel="noopener noreferrer">{courseProvider?.Website}</a></p>
           {courseProvider?.ContactEmail && <p className="mtb-10"><strong>Email:</strong> <a className="wmcads-link" href={`mailto:${courseProvider?.ContactEmail}`}>{courseProvider?.ContactEmail}</a></p>}
-          <p className="mtb-10"><strong>Phone:</strong> <a className="wmcads-link" href={`tel:${courseProvider?.ContactPhone}`}>{courseProvider?.ContactPhone}</a></p>
+          <p className="mtb-10"><strong>Phone:</strong> <a className="wmcads-link" href={`tel:${courseProvider?.ContactPhone && updateContactPhone(courseProvider)}`}>{courseProvider?.ContactPhone && updateContactPhone(courseProvider)}</a></p>
         </div>
       </div>
     )
