@@ -161,7 +161,7 @@ const Page = () => {
       <div className="wmcads-content-card wmcads-m-b-lg">
         <div className="wmcads-p-sm">
           {/* {accordionData} */}
-          <h2>Course provider</h2>
+          <h2>Find out more and apply</h2>
           <p><strong>{courseProvider?.CourseProvider}</strong></p>
           <p className="mtb-10"><strong>Website:</strong> <a className="wmcads-link" href={courseProvider?.Website} target="_blank" rel="noopener noreferrer">{courseProvider?.Website}</a></p>
           {courseProvider?.ContactEmail && <p className="mtb-10"><strong>Email:</strong> <a className="wmcads-link" href={`mailto:${courseProvider?.ContactEmail}`}>{courseProvider?.ContactEmail}</a></p>}

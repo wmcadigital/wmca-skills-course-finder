@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import AppLayout from '../../layout/index';
-import apiCoursesService from '../../services/apiCourses'
 import moment from 'moment';
 import AccordionComponent from '../../components/accordion'
 import CheckboxComponent from '../../components/checkbox'
@@ -74,7 +73,7 @@ const filterCoursesByStartDate = (courses, startBy) => {
 }
 
 const Page = () => {
-
+  console.log('Base URL:', window.location.hostname);
   const navigate = useNavigate();
   const [isOpenMobileFilters, setIsOpenMobileFilters] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
