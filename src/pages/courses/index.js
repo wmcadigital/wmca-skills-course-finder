@@ -573,7 +573,7 @@ const Page = () => {
                       <td className="" data-header="Header 2"><strong>Course type: </strong>{course.DeliverModeType}</td>
                     </tr>
                     <tr>
-                      <td className="" data-header="Header 2"><strong>Cost: </strong>{course.Cost === null ? 'N/A' : course.Cost}</td>
+                      <td className="" data-header="Header 2"><strong>Cost: </strong>{course?.CostDescription}</td>
                       <td className="" data-header="Header 2"><strong>Duration: </strong>{corsesDuration(course)}</td>
                     </tr>
                   </tbody>
