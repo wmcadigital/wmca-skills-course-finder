@@ -4,22 +4,23 @@ import apiCoursesService from '../../services/apiCourses'
 import moment from 'moment';
 import AccordionComponent from '../../components/accordion'
 import CheckboxComponent from '../../components/checkbox'
-import { useLocation, useNavigate, useLoaderData } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {openDB} from 'idb';
 
-
-export async function ApiFetchCourses() {
-
+const fetchApiData = async () => {
   try {
-    const courses = await apiCoursesService.getData();
-    return { courses };
+    const db1 = await openDB('coursesDB', 1);
 
+    // Assuming apiCoursesService.getData() returns a promise
+    const apiData = await apiCoursesService.getData();
+    const result = await db1.add('courses', JSON.stringify(apiData), 'courses');
+    // You can return a value here if needed
+    return result;
   } catch (error) {
-    console.error('Error fetching data:', error);
-    return { courses: [] };
+    // You can throw the error or return an error object, depending on your use case
+    throw error;
   }
-
-}
-
+};
 
 const itemsPerPage = 10;
 const maxIndexButtons = 5;
@@ -86,14 +87,14 @@ const filterCoursesByStartDate = (courses, startBy) => {
 }
 
 const Page = () => {
-  const coursesCollection = useLoaderData();
 
   const navigate = useNavigate();
   const [isOpenMobileFilters, setIsOpenMobileFilters] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
-  const [courses, setCourses] = useState(coursesCollection.courses || []);
-  const [getCourses, setGetCourses] = useState(coursesCollection.courses || []);
-  const [coursesCount, setCoursesCount] = useState(coursesCollection.courses.length || 0);
+  const [courses, setCourses] = useState([]);
+  const [firstApiCall, setFirstApiCall] = useState(false);
+  const [getCourses, setGetCourses] = useState([]);
+  const [coursesCount, setCoursesCount] = useState(0);
   const [accordionData, setAccordionData] = useState([
     {
       title: 'Course type', type: 'courseType', checkbox: [
@@ -123,7 +124,7 @@ const Page = () => {
   const searchParams = new URLSearchParams(location.search);
   const initialPage = parseInt(searchParams.get('page'), 10) || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filterIsModified, setFilterIsModified] = useState(false);
 
   const paramNames = ['startDate', 'sort', 'courseType', 'courseHours', 'courseStudyTime', 'searchTerm'];
@@ -150,20 +151,66 @@ const Page = () => {
     searchTerm: ''
   };
 
+  useEffect(() => {
+    console.log(2)
+    const fetchData = async () => {
+      try {
+        const db = await openDB('coursesDB', 1);
+        // Assuming 'courses' is the name of your object store
+        const result = await db.get('courses', 'courses');
+        db.close();
+        const coursesData = JSON.parse(result);
+
+        // Check if the data is an array
+        if (Array.isArray(coursesData)) {
+          setCourses(coursesData);
+          setGetCourses(coursesData);
+          setCoursesCount(coursesData.length);
+          setLoading(false)
+        } else {
+          console.error('Invalid data format');
+          // If the data format is invalid, use an empty array
+          setCourses([]);
+          setGetCourses([]);
+          setCoursesCount(0);
+        }
+      } catch (error) {
+        fetchApiData()
+          .then((result) => {
+            // Do something with the result if needed
+            setFirstApiCall(true)
+            console.log('Fetch data result:', result);
+          })
+          .catch((error) => {
+            // Handle errors if needed
+            // console.error('Error during data fetch:', error);
+          });
+        // console.error('Error:', error);
+        // If there's an error during the data fetching process, use an empty array
+        setCourses([]);
+        setGetCourses([]);
+        setCoursesCount(0);
+      }
+    };
+
+    fetchData();
+  }, [firstApiCall]); // Emp
 
   useEffect(() => {
+    console.log(3)
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 767);
     };
-
+    
     window.addEventListener('resize', handleResize);
-
+    
     return () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []); // Empty dependency array ensures that this effect runs once
-
+  
   useEffect(() => {
+    console.log(4)
     // Update the URL when the page or search term changes
     const newSearchParams = new URLSearchParams();
     newSearchParams.set('page', currentPage);
@@ -180,11 +227,12 @@ const Page = () => {
 
 
   useEffect(() => {
+    console.log(5)
     ScrollToTop()
   }, [currentPage]);
 
   useEffect(() => {
-
+    console.log(6)
     const hasFilterSetted = JSON.stringify(filter) !== JSON.stringify(initialFilter)
     setFilterIsModified(hasFilterSetted)
 
@@ -292,7 +340,6 @@ const Page = () => {
 
     if (coursesCount > 1) {
       return (<p className="course-count">{`Showing ${startIndex + 1} to ${endIndex} of `}<strong>{`${courses.length}`}</strong> courses</p>)
-      // return (<p className="load-block"></p>)
     } else if (coursesCount === 1) {
     } else if (loading) {
       return (<p className="load-block pulse"></p>)

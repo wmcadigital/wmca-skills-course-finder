@@ -5,6 +5,13 @@ import reportWebVitals from './reportWebVitals';
 import { RouterProvider, Navigate, createHashRouter} from "react-router-dom";
 import Courses, { ApiFetchCourses } from './pages/courses';
 import Course, { ApiFetchCourseDetails } from './pages/course';
+import { openDB } from 'idb';
+
+openDB('coursesDB', 1, {
+  upgrade(db) {
+    db.createObjectStore('courses');
+  },
+});
 
 const container = document.getElementById("root");
 const root = createRoot(container);
@@ -17,7 +24,7 @@ const router = createHashRouter([
   {
     path: "/course-finder",
     element: <Courses />,
-    loader: ApiFetchCourses,
+    // loader: ApiFetchCourses,
   },
   {
     path: "/course-finder/details",
