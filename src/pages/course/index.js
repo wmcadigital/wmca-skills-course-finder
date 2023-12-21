@@ -1,49 +1,37 @@
 import React, { useState, useEffect} from 'react';
 import AppLayout from '../../layout/index';
-import ApiCourse from '../../services/apiCourse'
-import ApiCourseProviders from '../../services/apiCourseProviders'
 import moment from 'moment';
-import { useNavigate, useLocation, useLoaderData } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { setCourseName$, courseName$ } from '../../services/rxjsStoreCourseName'
 import AccordionComponent from '../../components/accordion'
+import { openDB } from 'idb'
+import apiCourseProviderStorage from '../../services/apiCourseProviderStorage'
 
-export async function ApiFetchCourseDetails({ request }) {
-  
-  const searchParams = new URLSearchParams(new URL(request.url).search);
-  // Get the value of the 'courseId' parameter
-  const courseId = searchParams.get("courseId");
-  const startDate = searchParams.get("startDate");
-  const durationValue = searchParams.get("durationValue");
-  const locationName = searchParams.get("locationName");
-
-  try {
-    const course = await ApiCourse(courseId);
-    const courseFound = findCourse(course, startDate, durationValue, locationName)
-    setCourseName$(courseFound.CourseName)
-    const getCourseProvider = await ApiCourseProviders(courseFound.UKPRN);
-
-    return { courseFound, getCourseProvider };
-
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return { courseFound: [], getCourseProvider: [] };
-  }
-
-}
-
-export const findCourse = (courseArray, startDate, durationValue, locationName) => {
+export const findCourse = (courseArray, startDate, durationValue, locationName, courseID) => {
   return courseArray.find(course => {
+    const normalizedStartDate = startDate === "null" ? null : startDate;
     return (
-      course.StartDate === startDate &&
+      course.StartDate === normalizedStartDate &&
       course.DurationValue === durationValue &&
-      course.LocationName === locationName
+      course.LocationName === locationName &&
+      course.CourseID === courseID
     );
   });
 }
 
 export const setupAccordionData = (course) => {
-  // Destructure the object to extract the desired properties
-  const { EntryRequirements, LocationName, LocationAddressOne, LocationAddressTwo, LocationCounty, LocationPostcode, LocationTelephone, LocationTown, LocationWebsite } = course;
+  // Use default values for properties if they are undefined
+  const {
+    EntryRequirements = '',
+    LocationName = '',
+    LocationAddressOne = '',
+    LocationAddressTwo = '',
+    LocationCounty = '',
+    LocationPostcode = '',
+    LocationTelephone = '',
+    LocationTown = '',
+    LocationWebsite = ''
+  } = course || {};
 
   // Create a new object with the extracted properties
   return {
@@ -59,25 +47,78 @@ export const setupAccordionData = (course) => {
       LocationWebsite
     }
   };
-}
+};
 
 const Page = () => {
-  const courseInfo = useLoaderData();
-  const provider = courseInfo.getCourseProvider
-  const course = courseInfo.courseFound
-  const accData = setupAccordionData(course)
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const newTab = queryParams.get('newTab');
+  const courseId = queryParams.get("courseId");
+  const startDate = queryParams.get("startDate");
+  const durationValue = queryParams.get("durationValue");
+  const locationName = queryParams.get("locationName");
+
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
   const navigate = useNavigate();
-  const [getCourse] = useState(course || undefined);
-  const [courseProvider] = useState(provider || undefined);
-  const [accordionData] = useState(accData || undefined);
-  const [loading] = useState(undefined);
+  const [getCourse, setGetCourse] = useState(undefined);
+  const [courseProvider, setCourseProvider] = useState(undefined);
+  const [accordionData, setAccordionData] = useState(undefined);
+  const [loading, setLoading] = useState(undefined);
   const [hideBackToResultsBtn, setHideBackToResultsBtn] = useState(false);
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
 
-  const newTab = queryParams.get('newTab');
+  const setPageRequest = (coursesData, providersData) => {
+    // Check if the data is an array
+    if (Array.isArray(coursesData) && Array.isArray(providersData)) {
+      const course = findCourse(coursesData, startDate, durationValue, locationName, courseId)
+      const provider = providersData.filter(provider => provider?.UKPRN === course?.UKPRN)
+
+      setCourseName$(course?.CourseName)
+      setGetCourse(course)
+      setCourseProvider(provider[0])
+      const accData = setupAccordionData(course)
+      setAccordionData(accData)
+      setLoading(false)
+    } else {
+      console.error('Invalid data format???????????');
+      // If the data format is invalid, use an empty array
+    }
+  }
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const db = await openDB('coursesDB', 1);
+        // Assuming 'courses' is the name of your object store
+        const result = await db.get('courses', 'courses');
+        const result2 = await db.get('providers', 'providers');
+        db.close();
+
+        const coursesData = JSON.parse(result);
+        const providersData = JSON.parse(result2);
+
+        console.log(coursesData)
+        console.log(providersData)
+        setPageRequest(coursesData, providersData)
+      } catch (error) {
+        apiCourseProviderStorage()
+          .then((result) => {
+            setPageRequest(result.courses, result.providers)
+          })
+          .catch((error) => {
+            console.error('Error during data fetch:', error);
+          });
+        // console.error('Error:', error);
+        // If there's an error during the data fetching process, use an empty array
+        // setCourses([]);
+        // setGetCourses([]);
+        // setCoursesCount(0);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -121,10 +162,10 @@ const Page = () => {
         <div className="wmcads-p-sm">
           {/* {accordionData} */}
           <h2>Course provider</h2>
-          <p><strong>{courseProvider.CourseProvider}</strong></p>
-          <p className="mtb-10"><strong>Website:</strong> <a className="wmcads-link" href={courseProvider.Website} target="_blank" rel="noopener noreferrer">{courseProvider.Website}</a></p>
-          {courseProvider.ContactEmail && <p className="mtb-10"><strong>Email:</strong> <a className="wmcads-link" href={`mailto:${courseProvider.ContactEmail}`}>{courseProvider.ContactEmail}</a></p>}
-          <p className="mtb-10"><strong>Phone:</strong> <a className="wmcads-link" href={`tel:${courseProvider.ContactPhone}`}>{courseProvider.ContactPhone}</a></p>
+          <p><strong>{courseProvider?.CourseProvider}</strong></p>
+          <p className="mtb-10"><strong>Website:</strong> <a className="wmcads-link" href={courseProvider?.Website} target="_blank" rel="noopener noreferrer">{courseProvider?.Website}</a></p>
+          {courseProvider?.ContactEmail && <p className="mtb-10"><strong>Email:</strong> <a className="wmcads-link" href={`mailto:${courseProvider?.ContactEmail}`}>{courseProvider?.ContactEmail}</a></p>}
+          <p className="mtb-10"><strong>Phone:</strong> <a className="wmcads-link" href={`tel:${courseProvider?.ContactPhone}`}>{courseProvider?.ContactPhone}</a></p>
         </div>
       </div>
     )
@@ -137,48 +178,48 @@ const Page = () => {
       ) : (
           <>
             <div className="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none ">
-              <h1 id="wmcads-main-content">{getCourse.CourseName}</h1>
+              <h1 id="wmcads-main-content">{getCourse?.CourseName}</h1>
               {isMobile && providerDetails(courseProvider)}
               <h2>Course details</h2>
               <table className="wmcads-table wmcads-m-b-xl wmcads-table--without-header">
                 <tbody>
                   <tr>
                     <th scope="row" data-header="Header 1">Qualification name</th>
-                    <td data-header="Header 2">{getCourse.CourseName}</td>
+                    <td data-header="Header 2">{getCourse?.CourseName}</td>
                   </tr>
                   <tr>
                     <th scope="row" data-header="Header 1">Qualification level</th>
-                    <td data-header="Header 2">{getCourse.NotionalNVQLevel}</td>
+                    <td data-header="Header 2">{getCourse?.NotionalNVQLevel}</td>
                   </tr>
                   <tr>
                     <th scope="row" data-header="Header 1">Awarding organisation</th>
-                    <td data-header="Header 2">{getCourse.AwardOrgName}</td>
+                    <td data-header="Header 2">{getCourse?.AwardOrgName}</td>
                   </tr>
                   <tr>
                     <th scope="row" data-header="Header 1">Course type</th>
-                    <td data-header="Header 2">{getCourse.DeliverModeType}</td>
+                    <td data-header="Header 2">{getCourse?.DeliverModeType}</td>
                   </tr>
                   <tr>
                     <th scope="row" data-header="Header 1">Course hours</th>
-                    <td data-header="Header 2">{getCourse.StudyModeType}</td>
+                    <td data-header="Header 2">{getCourse?.StudyModeType}</td>
                   </tr>
                   <tr>
                     <th scope="row" data-header="Header 1">Course start date</th>
-                    <td data-header="Header 2">{startDateFn(getCourse.StartDate)}</td>
+                    <td data-header="Header 2">{startDateFn(getCourse?.StartDate)}</td>
                   </tr>
                   <tr>
                     <th scope="row" data-header="Header 1">Costs</th>
-                    <td data-header="Header 2">{getCourse.CostDescription}</td>
+                    <td data-header="Header 2">{getCourse?.CostDescription}</td>
                   </tr>
                 </tbody>
               </table>
 
               {
-                getCourse.CourseDescription && (
+                getCourse?.CourseDescription && (
                   <>
                     <h2>Course description</h2>
                     <p>
-                      <div dangerouslySetInnerHTML={{ __html: getCourse.CourseDescription }}></div>
+                      <div dangerouslySetInnerHTML={{ __html: getCourse?.CourseDescription }}></div>
                     </p>
                   </>
                 )
@@ -221,6 +262,7 @@ const Page = () => {
   );
 };
 
+
 const Course = () => {
   const [courseName, setCourseName] = useState(undefined);
 
@@ -230,7 +272,7 @@ const Course = () => {
       setCourseName(name);
     })
 
-  }, []); 
+  }, []);
 
   const breadCrumb = [
     {
@@ -238,7 +280,7 @@ const Course = () => {
       path: '/course-finder',
     },
     {
-      name:  courseName || '',
+      name: courseName || '',
     },
   ];
 

@@ -10,6 +10,7 @@ import { openDB } from 'idb';
 openDB('coursesDB', 1, {
   upgrade(db) {
     db.createObjectStore('courses');
+    db.createObjectStore('providers');
   },
 });
 
@@ -29,7 +30,7 @@ const router = createHashRouter([
   {
     path: "/course-finder/details",
     element: <Course />,
-    loader: ApiFetchCourseDetails,
+    // loader: ApiFetchCourseDetails,
   },
 ]);
 

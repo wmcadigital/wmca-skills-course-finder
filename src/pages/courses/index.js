@@ -5,22 +5,9 @@ import moment from 'moment';
 import AccordionComponent from '../../components/accordion'
 import CheckboxComponent from '../../components/checkbox'
 import { useLocation, useNavigate } from 'react-router-dom';
-import {openDB} from 'idb';
+import { openDB } from 'idb';
+import apiCourseProviderStorage from '../../services/apiCourseProviderStorage'
 
-const fetchApiData = async () => {
-  try {
-    const db1 = await openDB('coursesDB', 1);
-
-    // Assuming apiCoursesService.getData() returns a promise
-    const apiData = await apiCoursesService.getData();
-    const result = await db1.add('courses', JSON.stringify(apiData), 'courses');
-    // You can return a value here if needed
-    return result;
-  } catch (error) {
-    // You can throw the error or return an error object, depending on your use case
-    throw error;
-  }
-};
 
 const itemsPerPage = 10;
 const maxIndexButtons = 5;
@@ -92,7 +79,6 @@ const Page = () => {
   const [isOpenMobileFilters, setIsOpenMobileFilters] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
   const [courses, setCourses] = useState([]);
-  const [firstApiCall, setFirstApiCall] = useState(false);
   const [getCourses, setGetCourses] = useState([]);
   const [coursesCount, setCoursesCount] = useState(0);
   const [accordionData, setAccordionData] = useState([
@@ -152,38 +138,23 @@ const Page = () => {
   };
 
   useEffect(() => {
-    console.log(2)
     const fetchData = async () => {
       try {
         const db = await openDB('coursesDB', 1);
         // Assuming 'courses' is the name of your object store
         const result = await db.get('courses', 'courses');
         db.close();
-        const coursesData = JSON.parse(result);
 
+        const coursesData = JSON.parse(result);
+        setPageRequest(coursesData)
         // Check if the data is an array
-        if (Array.isArray(coursesData)) {
-          setCourses(coursesData);
-          setGetCourses(coursesData);
-          setCoursesCount(coursesData.length);
-          setLoading(false)
-        } else {
-          console.error('Invalid data format');
-          // If the data format is invalid, use an empty array
-          setCourses([]);
-          setGetCourses([]);
-          setCoursesCount(0);
-        }
       } catch (error) {
-        fetchApiData()
+        apiCourseProviderStorage()
           .then((result) => {
-            // Do something with the result if needed
-            setFirstApiCall(true)
-            console.log('Fetch data result:', result);
+            setPageRequest(result.courses)
           })
           .catch((error) => {
-            // Handle errors if needed
-            // console.error('Error during data fetch:', error);
+            console.error('Error during data fetch:', error);
           });
         // console.error('Error:', error);
         // If there's an error during the data fetching process, use an empty array
@@ -194,10 +165,9 @@ const Page = () => {
     };
 
     fetchData();
-  }, [firstApiCall]); // Emp
+  }, []);
 
   useEffect(() => {
-    console.log(3)
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 767);
     };
@@ -210,7 +180,6 @@ const Page = () => {
   }, []); // Empty dependency array ensures that this effect runs once
   
   useEffect(() => {
-    console.log(4)
     // Update the URL when the page or search term changes
     const newSearchParams = new URLSearchParams();
     newSearchParams.set('page', currentPage);
@@ -227,12 +196,10 @@ const Page = () => {
 
 
   useEffect(() => {
-    console.log(5)
     ScrollToTop()
   }, [currentPage]);
 
   useEffect(() => {
-    console.log(6)
     const hasFilterSetted = JSON.stringify(filter) !== JSON.stringify(initialFilter)
     setFilterIsModified(hasFilterSetted)
 
@@ -301,6 +268,21 @@ const Page = () => {
       [selection]: value,
     }));
   };
+
+  const setPageRequest = (coursesData) => {
+    if (Array.isArray(coursesData)) {
+      setCourses(coursesData);
+      setGetCourses(coursesData);
+      setCoursesCount(coursesData.length);
+      setLoading(false)
+    } else {
+      console.error('Invalid data format');
+      // If the data format is invalid, use an empty array
+      setCourses([]);
+      setGetCourses([]);
+      setCoursesCount(0);
+    }
+  }
 
   const toggleMobileFilters = (e) => {
     setIsOpenMobileFilters(!isOpenMobileFilters)
