@@ -1,23 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-     <!-- CSS for WMCA Design System -->
-    <link rel="stylesheet" href="https://cloudcdn.wmca.org.uk/wmcaassets/ds/1.5.0/css/wmcads.min.css" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Web site created using create-react-app" />
+  <!-- CSS for WMCA Design System -->
+  <link rel="stylesheet" href="https://cloudcdn.wmca.org.uk/wmcaassets/ds/1.5.0/css/wmcads.min.css" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
@@ -26,12 +24,54 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
+
+  <!-- General -->
+  <title>West Midlands Combined Authority - Find a funded course for adults in the West Midland</title>
+  <meta name="keywords"
+    content="west midlands, combined authority, local authorities, culture, economy, innovation, environment, energy, housing, land, communities, skills, wellbeing, transport">
+  <meta name="description"
+    content="West Midlands Combined Authority (WMCA) was set up in 2016. We want to make the West Midlands a happy, healthy, place to live.">
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.wmca.org.uk/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.wmca.org.uk/">
+  <meta property="og:title" content="West Midlands Combined Authority">
+  <meta property="og:description"
+    content="West Midlands Combined Authority (WMCA) was set up in 2016. We want to make the West Midlands a happy, healthy, place to live.">
+  <meta property="og:image"
+    content="https://www.wmca.org.uk/media/112jxcbb/wmca-centenary-square-77-edited.png?anchor=center&amp;mode=crop&amp;width=1200&amp;height=630&amp;rnd=133153337295270000">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:url" content="https://www.wmca.org.uk/">
+  <meta name="twitter:title" content="West Midlands Combined Authority">
+  <meta name="twitter:description"
+    content="West Midlands Combined Authority (WMCA) was set up in 2016. We want to make the West Midlands a happy, healthy, place to live.">
+  <meta name="twitter:image"
+    content="https://www.wmca.org.uk/media/112jxcbb/wmca-centenary-square-77-edited.png?anchor=center&amp;mode=crop&amp;width=750&amp;height=500&amp;rnd=133153337295270000">
+  <meta name="twitter:site" content="https://twitter.com/WestMids_CA" />
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cloudcdn.wmca.org.uk/wmcabeta/config/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://cloudcdn.wmca.org.uk/wmcabeta/config/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="194x194"
+    href="https://cloudcdn.wmca.org.uk/wmcabeta/config/favicon-194x194.png">
+  <link rel="icon" type="image/png" sizes="192x192"
+    href="https://cloudcdn.wmca.org.uk/wmcabeta/config/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://cloudcdn.wmca.org.uk/wmcabeta/config/favicon-16x16.png">
+  <link rel="manifest" href="https://cloudcdn.wmca.org.uk/wmcabeta/config/webmanifest.json">
+  <link rel="mask-icon" href="https://cloudcdn.wmca.org.uk/wmcabeta/config/safari-pinned-tab.svg" color="#f58025">
+  <meta name="apple-mobile-web-app-title" content="WMCA">
+  <meta name="application-name" content="WMCA">
+  <meta name="msapplication-TileColor" content="#000000">
+  <meta name="msapplication-TileImage" content="https://cloudcdn.wmca.org.uk/wmcabeta/config/mstile-144x144.png">
+  <meta name="theme-color" content="#f58025">
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -41,17 +81,18 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-        <!-- Ajax SVGs from WMCA Design System -->
-    <script>
-      const ajax = new XMLHttpRequest();
-      ajax.open('GET', 'https://cloudcdn.wmca.org.uk/wmcaassets/ds/1.5.0/img/wmcads-icons.min.svg', true);
-      ajax.send();
-      ajax.onload = function () {
-        const div = document.createElement('div');
-        div.style.display = 'none';
-        div.innerHTML = ajax.responseText;
-        document.body.insertBefore(div, document.body.childNodes[0]);
-      };
-    </script>
-  </body>
+  <!-- Ajax SVGs from WMCA Design System -->
+  <script>
+    const ajax = new XMLHttpRequest();
+    ajax.open('GET', 'https://cloudcdn.wmca.org.uk/wmcaassets/ds/1.5.0/img/wmcads-icons.min.svg', true);
+    ajax.send();
+    ajax.onload = function () {
+      const div = document.createElement('div');
+      div.style.display = 'none';
+      div.innerHTML = ajax.responseText;
+      document.body.insertBefore(div, document.body.childNodes[0]);
+    };
+  </script>
+</body>
+
 </html>
