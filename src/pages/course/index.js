@@ -193,8 +193,6 @@ const Page = () => {
     )
   }
 
-  console.log(getCourse);
-
   return (
     <div className="course-details-page">
       {loading ? (
