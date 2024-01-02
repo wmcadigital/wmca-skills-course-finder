@@ -169,10 +169,12 @@ const Page = () => {
       <div className="wmcads-content-card wmcads-m-b-lg">
         <div className="wmcads-p-sm">
           <h2>Find out more and apply</h2>
+          <p>Interested in this course? Get in touch with the training provider to find out more and apply.</p>
           <p><strong>{courseProvider?.CourseProvider}</strong></p>
           <p className="mtb-10"><strong>Website:</strong> <a className="wmcads-link" href={courseProvider?.Website} target="_blank" rel="noopener noreferrer">{courseProvider?.Website}</a></p>
           {courseProvider?.ContactEmail && <p className="mtb-10"><strong>Email:</strong> <a className="wmcads-link" href={`mailto:${courseProvider?.ContactEmail}`}>{courseProvider?.ContactEmail}</a></p>}
           <p className="mtb-10"><strong>Phone:</strong> <a className="wmcads-link" href={`tel:${courseProvider?.ContactPhone && updateContactPhone(courseProvider)}`}>{courseProvider?.ContactPhone && updateContactPhone(courseProvider)}</a></p>
+          {getCourse?.CourseURL && <p className="mtb-10"><strong>Course Website:</strong> <a href={getCourse?.CourseURL} title="View the course on the course providors website" target="_blank" rel="noreferrer" className="wmcads-link"><span>Go to course</span></a></p>}
         </div>
       </div>
     )
@@ -190,6 +192,8 @@ const Page = () => {
       </div>
     )
   }
+
+  console.log(getCourse);
 
   return (
     <div className="course-details-page">
@@ -271,7 +275,8 @@ const Page = () => {
                   </div>
                 } />
               </div>
-              {!hideBackToResultsBtn && <a href="#" onClick={handleGoBack} title="link title" target="_self" className="wmcads-link"><span>&lt; Back to results</span></a>}
+              {getCourse?.CourseURL && <a href={getCourse?.CourseURL} title="View the course on the course providors website" target="_blank" rel="noreferrer" className="wmcads-link"><span>Go to course</span></a>}
+              {!hideBackToResultsBtn && <><br /><br /><a href="/" onClick={handleGoBack} title="Go back to search results" target="_self" className="wmcads-link"><span>&lt; Back to results</span></a></>}
             </div>
             <aside className="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
               {!isMobile && providerDetails(courseProvider)}
