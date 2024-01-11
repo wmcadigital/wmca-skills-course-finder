@@ -100,10 +100,10 @@ const Page = () => {
 
         setPageRequest(coursesData, providersData)
       } catch (error) {
+        // When coming from permalink
         apiCourseProviderStorage()
-          .then((result) => {
-            setPageRequest(result.courses, result.providers)
-          })
+        .then((result) => {
+          setPageRequest(result.courses, result.providers)})
           .catch((error) => {
             console.error('Error during data fetch:', error);
           });
