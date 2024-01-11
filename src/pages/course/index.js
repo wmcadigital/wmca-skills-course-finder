@@ -64,7 +64,7 @@ const Page = () => {
   const [getCourse, setGetCourse] = useState(undefined);
   const [courseProvider, setCourseProvider] = useState(undefined);
   const [accordionData, setAccordionData] = useState(undefined);
-  const [loading, setLoading] = useState(undefined);
+  const [loading, setLoading] = useState(true);
   const [hideBackToResultsBtn, setHideBackToResultsBtn] = useState(false);
 
   const setPageRequest = (coursesData, providersData) => {
@@ -136,10 +136,18 @@ const Page = () => {
 
   const loader = () => {
     return (
-      <div className="wmcads-loader wmcads-loader--large" role="alert" aria-live="assertive">
-        <p className="wmcads-loader__content">Content is loading...</p>
+      <div className="wmcads-grid">
+        <div className="wmcads-col-1 wmcads-col-md-2-3">
+          <div
+            className="wmcads-loader wmcads-loader--large"
+            role="alert"
+            aria-live="assertive"
+          >
+            <p className="wmcads-loader__content">Content is loading...</p>
+          </div>
+        </div>
       </div>
-    )
+    );
   }
 
   const startDateFn = (courseDate) => {
