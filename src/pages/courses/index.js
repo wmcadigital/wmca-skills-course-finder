@@ -672,7 +672,7 @@ const Page = () => {
           </div>
         </div>
         <aside className="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
-          <div className="sticky-aside">
+          <div className="aside">
           <hr className="wmcads-hide-desktop"/>
           {!isMobile && searchByStartDate() }
           <div id="search_filter" className={`wmcads-search-filter ${isOpenMobileFilters ? 'open' : ''}`}>
