@@ -41,10 +41,10 @@ const Breadcrumbs = ({ breadCrumb }) => {
         </li>
         <li className="wmcads-breadcrumb__list-item">
           <a
-            href="https://www.wmca.org.uk/what-we-do/productivity-and-skills/"
+            href="https://www.wmca.org.uk/what-we-do/employment-and-skills/"
             className="wmcads-breadcrumb__link"
           >
-            Productivity and Skills
+            Employment and Skills
           </a>
         </li>
         {generateBreadcrumbLinks()}
