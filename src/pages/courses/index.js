@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ReactGA from 'react-ga4';
 import AppLayout from '../../layout/index';
 import moment from 'moment';
 import AccordionComponent from '../../components/accordion'
@@ -12,6 +13,11 @@ const maxIndexButtons = 5;
 
 const searchCourses = (courses, searchTerm) => {
   const searchTermRegex = new RegExp(`\\b${searchTerm}`, "i");
+  ReactGA.event({
+    category: 'Search',
+    action: 'Search',
+    label: searchTerm,
+});
   return courses.filter((course) =>
     searchTermRegex.test(course.CourseName)
   );
@@ -294,6 +300,11 @@ const Page = () => {
   }
 
   const courseDetailsLink = (e, course) => {
+    ReactGA.event({
+      category: 'Course link',
+      action: 'click',
+      label: `Course ID: ${course.CourseID}`,
+  })
     e.preventDefault()
     navigate(`/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`);
   };

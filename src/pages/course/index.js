@@ -6,6 +6,8 @@ import { setCourseName$, courseName$ } from '../../services/rxjsStoreCourseName'
 import AccordionComponent from '../../components/accordion'
 import { openDB } from 'idb'
 import apiCourseProviderStorage from '../../services/apiCourseProviderStorage'
+import ReactGA from 'react-ga4';
+const TRACKING_ID = "G-PL6P8LRKHT";
 
 export const findCourse = (courseArray, startDate, durationValue, locationName, courseID) => {
   return courseArray.find(course => {
@@ -115,6 +117,10 @@ const Page = () => {
       }
     };
 
+      // Send pageview with a custom path
+      ReactGA.send({ hitType: "pageview", page: `/#/course-finder/details?courseId=${courseId}`, title:courseName$._value });
+      console.log(courseId);
+      console.log(courseName$._value);
     fetchData();
   }, []);
 
