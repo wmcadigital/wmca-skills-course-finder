@@ -13,14 +13,14 @@ const maxIndexButtons = 5;
 
 const searchCourses = (courses, searchTerm) => {
   const searchTermRegex = new RegExp(`\\b${searchTerm}`, "i");
-  ReactGA.event({
-    category: 'Search',
-    action: 'Search',
-    label: searchTerm,
-});
   return courses.filter((course) =>
     searchTermRegex.test(course.CourseName)
   );
+  /*ReactGA.event({
+    category: 'Search',
+    action: 'Search',
+    label: searchTerm,
+});*/
 };
 
 const filterCourses = (courses, studyModes, filterType) => {
@@ -108,7 +108,14 @@ const Page = () => {
         { name: 'Day or block release', checked: false }
       ],
     },
-  ]);
+  ],
+  ReactGA.event({
+    category: 'Filters',
+    action: 'click',
+    label: filterCourses,
+  },
+),
+);
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -305,9 +312,16 @@ const Page = () => {
       action: 'click',
       label: `Course ID: ${course.CourseID}`,
   })
+    ReactGA.event({
+      category: 'Search term',
+      action: 'click',
+      label: location,
+    })
     e.preventDefault()
     navigate(`/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`);
   };
+
+  console.log(location);
 
   const handleCheckboxChange = (accordionIndex, checkboxIndex) => {
     const updatedAccordionData = [...accordionData];
