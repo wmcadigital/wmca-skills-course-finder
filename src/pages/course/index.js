@@ -7,7 +7,6 @@ import AccordionComponent from '../../components/accordion'
 import { openDB } from 'idb'
 import apiCourseProviderStorage from '../../services/apiCourseProviderStorage'
 import ReactGA from 'react-ga4';
-const TRACKING_ID = "G-PL6P8LRKHT";
 
 export const findCourse = (courseArray, startDate, durationValue, locationName, courseID) => {
   return courseArray.find(course => {
@@ -122,7 +121,7 @@ const Page = () => {
       console.log(courseId);
       console.log(courseName$._value);
     fetchData();
-  }, []);
+  }, [courseId, setPageRequest]);
 
   useEffect(() => {
     const handleResize = () => {

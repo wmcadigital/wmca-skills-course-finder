@@ -16,11 +16,6 @@ const searchCourses = (courses, searchTerm) => {
   return courses.filter((course) =>
     searchTermRegex.test(course.CourseName)
   );
-  /*ReactGA.event({
-    category: 'Search',
-    action: 'Search',
-    label: searchTerm,
-});*/
 };
 
 const filterCourses = (courses, studyModes, filterType) => {
@@ -321,8 +316,6 @@ const Page = () => {
     navigate(`/course-finder/details?courseId=${course.CourseID}&locationName=${course.LocationName}&startDate=${course.StartDate}&durationValue=${course.DurationValue}`);
   };
 
-  console.log(location);
-
   const handleCheckboxChange = (accordionIndex, checkboxIndex) => {
     const updatedAccordionData = [...accordionData];
     updatedAccordionData[accordionIndex].checkbox[checkboxIndex].checked = !updatedAccordionData[accordionIndex].checkbox[checkboxIndex].checked;
@@ -472,7 +465,6 @@ const Page = () => {
     e.preventDefault();
     setCurrentPage(page);
   };
-
 
   const generatePageIndexPagination = () => {
     const Li = [];
@@ -638,6 +630,18 @@ const Page = () => {
     );
   };
 
+  const searchGA = (searchTerms) => {
+    console.log('search ga');
+    console.log(searchTerms);
+    if(searchTerms !== 'undefined') {
+      ReactGA.event({
+        category: 'course search',
+        action: 'search',
+        label: searchTerms,
+      });
+    }
+};
+
   return (
     <div className="template-search">
       <div className="wmcads-m-b-lg">
@@ -647,7 +651,7 @@ const Page = () => {
             <input id="searchBar_input" aria-label="Search" type="text" value={filter.searchTerm} className="wmcads-search-bar__input wmcads-fe-input" placeholder="Search course title or subject..." onChange={(e) => setFilter((prevFilter) => ({
               ...prevFilter,
               searchTerm: e.target.value,
-            }))} />
+            }))} onBlur={(e) => searchGA(e.target.value)} />
               <button className="wmcads-search-bar__btn" type="submit" onClick={(e) => e.preventDefault()}>
                 <svg>
                   <title>Search</title>
