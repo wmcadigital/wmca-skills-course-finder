@@ -6,6 +6,7 @@ import { setCourseName$, courseName$ } from '../../services/rxjsStoreCourseName'
 import AccordionComponent from '../../components/accordion'
 import { openDB } from 'idb'
 import apiCourseProviderStorage from '../../services/apiCourseProviderStorage'
+import ReactGA from 'react-ga4';
 
 export const findCourse = (courseArray, startDate, durationValue, locationName, courseID) => {
   return courseArray.find(course => {
@@ -115,8 +116,12 @@ const Page = () => {
       }
     };
 
+      // Send pageview with a custom path
+      ReactGA.send({ hitType: "pageview", page: `/#/course-finder/details?courseId=${courseId}`, title:courseName$._value });
+      console.log(courseId);
+      console.log(courseName$._value);
     fetchData();
-  }, []);
+  }, [courseId, setPageRequest]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -160,6 +165,13 @@ const Page = () => {
   const handleGoBack = (e) => {
     e.preventDefault()
     navigate(-1); // Navigate back one step
+    console.log('backToResults-ga')
+    ReactGA.event(
+    {
+      category: 'Back to results',
+      action: 'click',
+      label: e,
+    })
   };
 
 
@@ -172,6 +184,67 @@ const Page = () => {
     }
   }
 
+  const handleProviderWebsiteClick = (providerWebsite) => {
+    console.log('website-ga')
+    ReactGA.event(
+    {
+      category: 'Course Provider Website link',
+      action: 'click',
+      label: providerWebsite,
+    })
+  };
+
+  const handleProviderPhoneClick = (providerPhone) => {
+    console.log('phone-ga')
+    ReactGA.event(
+    {
+      category: 'Course Provider Phone Number link',
+      action: 'click',
+      label: providerPhone,
+    })
+  };
+
+  const handleProviderEmailClick = (providerEmail) => {
+    console.log('email-ga')
+    ReactGA.event(
+    {
+      category: 'Course Provider Email link',
+      action: 'click',
+      label: providerEmail,
+    })
+  };
+
+  const handleCourseURLClick = (courseWebsite) => {
+    console.log('website2-ga')
+    ReactGA.event(
+    {
+      category: 'Course Website link',
+      action: 'click',
+      label: courseWebsite,
+    })
+  };
+
+
+  const handleLiveChatNCSClick = (liveChatNCS) => {
+    console.log('liveChat-ga')
+    ReactGA.event(
+    {
+      category: 'National Careers Service Live Chat',
+      action: 'click',
+      label: liveChatNCS,
+    })
+  };
+
+  const handlePhoneNCSClick = (phoneNCS) => {
+    console.log('phone2-ga')
+    ReactGA.event(
+    {
+      category: 'National Careers Service Phone',
+      action: 'click',
+      label: phoneNCS,
+    })
+  };
+
   const providerDetails = (courseProvider) => {
     return (
       <div className="wmcads-content-card wmcads-m-b-lg">
@@ -179,10 +252,25 @@ const Page = () => {
           <h2>Find out more and apply</h2>
           <p>Interested in this course? Get in touch with the training provider to find out more and apply.</p>
           <p><strong>{courseProvider?.CourseProvider}</strong></p>
-          <p className="mtb-10"><strong>Website:</strong> <a className="wmcads-link" href={courseProvider?.Website} target="_blank" rel="noopener noreferrer">{courseProvider?.Website}</a></p>
-          {courseProvider?.ContactEmail && <p className="mtb-10"><strong>Email:</strong> <a className="wmcads-link" href={`mailto:${courseProvider?.ContactEmail}`}>{courseProvider?.ContactEmail}</a></p>}
-          <p className="mtb-10"><strong>Phone:</strong> <a className="wmcads-link" href={`tel:${courseProvider?.ContactPhone && updateContactPhone(courseProvider)}`}>{courseProvider?.ContactPhone && updateContactPhone(courseProvider)}</a></p>
-          {getCourse?.CourseURL && <p className="mtb-10"><strong>Course Website:</strong> <a href={getCourse?.CourseURL} title="View the course on the course providors website" target="_blank" rel="noreferrer" className="wmcads-link"><span>Go to course</span></a></p>}
+          <p className="mtb-10"><strong>Website:</strong> 
+            <a onClick={() => handleProviderWebsiteClick(courseProvider.Website)} className="wmcads-link" href={courseProvider?.Website} target="_blank" rel="noopener noreferrer">
+              {courseProvider?.Website}
+            </a>
+          </p>
+          {courseProvider?.ContactEmail && <p className="mtb-10"><strong>Email:</strong>
+          <a onClick={() => handleProviderEmailClick(courseProvider.ContactEmail)} className="wmcads-link" href={`mailto:${courseProvider?.ContactEmail}`}>
+            {courseProvider?.ContactEmail}
+          </a>
+          </p>}
+          <p className="mtb-10"><strong>Phone:</strong> 
+            <a onClick={() => handleProviderPhoneClick(courseProvider.ContactPhone)} className="wmcads-link" href={`tel:${courseProvider?.ContactPhone && updateContactPhone(courseProvider)}`}>
+              {courseProvider?.ContactPhone && updateContactPhone(courseProvider)}
+            </a>
+          </p>
+          {getCourse?.CourseURL && <p className="mtb-10"><strong>Course Website:</strong> 
+          <a onClick={() => handleCourseURLClick(getCourse.CourseURL)} href={getCourse?.CourseURL} title="View the course on the course providors website" target="_blank" rel="noreferrer" className="wmcads-link"><span>Go to course</span>
+          </a>
+          </p>}
         </div>
       </div>
     )
@@ -194,8 +282,8 @@ const Page = () => {
         <div className="wmcads-p-sm">
           <h2>Get help and advice</h2>
           <p>Not sure which course is right for you? Our partners at National Careers Service are on hand to help</p>
-          <p className="mtb-10"><strong>Live chat:</strong> <a className="wmcads-link" href="https://nationalcareers.service.gov.uk/webchat/chat" target="_blank" rel="noopener noreferrer">Speak to an adviser on webchat</a></p>
-          <p className="mtb-10"><strong>Phone:</strong> <a className="wmcads-link" href={`tel:0800100900`}>0800 100 900</a></p>
+          <p className="mtb-10"><strong>Live chat:</strong> <a onClick={() => handleLiveChatNCSClick()} className="wmcads-link" href="https://nationalcareers.service.gov.uk/webchat/chat" target="_blank" rel="noopener noreferrer">Speak to an adviser on webchat</a></p>
+          <p className="mtb-10"><strong>Phone:</strong> <a onClick={() => handlePhoneNCSClick()} className="wmcads-link" href={`tel:0800100900`}>0800 100 900</a></p>
         </div>
       </div>
     )
