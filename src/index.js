@@ -10,6 +10,8 @@ import ReactGA from 'react-ga4';
 const TRACKING_ID = "G-PL6P8LRKHT";
 ReactGA.initialize(TRACKING_ID);
 
+console.log('v1.0.9');
+
 openDB('coursesDB', 1, {
   upgrade(db) {
     if (!db.objectStoreNames.contains('courses')) {

@@ -631,8 +631,6 @@ const Page = () => {
   };
 
   const searchGA = (searchTerms) => {
-    console.log('search ga');
-    console.log(searchTerms);
     if(searchTerms !== 'undefined') {
       ReactGA.event({
         category: 'course search',

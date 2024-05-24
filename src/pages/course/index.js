@@ -118,8 +118,6 @@ const Page = () => {
 
       // Send pageview with a custom path
       ReactGA.send({ hitType: "pageview", page: `/#/course-finder/details?courseId=${courseId}`, title:courseName$._value });
-      console.log(courseId);
-      console.log(courseName$._value);
     fetchData();
   }, [courseId, setPageRequest]);
 
@@ -165,7 +163,6 @@ const Page = () => {
   const handleGoBack = (e) => {
     e.preventDefault()
     navigate(-1); // Navigate back one step
-    console.log('backToResults-ga')
     ReactGA.event(
     {
       category: 'Back to results',
@@ -185,7 +182,6 @@ const Page = () => {
   }
 
   const handleProviderWebsiteClick = (providerWebsite) => {
-    console.log('website-ga')
     ReactGA.event(
     {
       category: 'Course Provider Website link',
@@ -195,7 +191,6 @@ const Page = () => {
   };
 
   const handleProviderPhoneClick = (providerPhone) => {
-    console.log('phone-ga')
     ReactGA.event(
     {
       category: 'Course Provider Phone Number link',
@@ -205,7 +200,6 @@ const Page = () => {
   };
 
   const handleProviderEmailClick = (providerEmail) => {
-    console.log('email-ga')
     ReactGA.event(
     {
       category: 'Course Provider Email link',
@@ -215,7 +209,6 @@ const Page = () => {
   };
 
   const handleCourseURLClick = (courseWebsite) => {
-    console.log('website2-ga')
     ReactGA.event(
     {
       category: 'Course Website link',
@@ -226,7 +219,6 @@ const Page = () => {
 
 
   const handleLiveChatNCSClick = (liveChatNCS) => {
-    console.log('liveChat-ga')
     ReactGA.event(
     {
       category: 'National Careers Service Live Chat',
@@ -236,7 +228,6 @@ const Page = () => {
   };
 
   const handlePhoneNCSClick = (phoneNCS) => {
-    console.log('phone2-ga')
     ReactGA.event(
     {
       category: 'National Careers Service Phone',
