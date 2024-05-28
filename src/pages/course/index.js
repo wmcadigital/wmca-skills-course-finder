@@ -7,6 +7,7 @@ import AccordionComponent from '../../components/accordion'
 import { openDB } from 'idb'
 import apiCourseProviderStorage from '../../services/apiCourseProviderStorage'
 import ReactGA from 'react-ga4';
+const TRACKING_ID = "G-PL6P8LRKHT";
 
 export const findCourse = (courseArray, startDate, durationValue, locationName, courseID) => {
   return courseArray.find(course => {
@@ -86,6 +87,17 @@ const Page = () => {
     }
   }
 
+  useEffect(() => {
+    ReactGA.initialize(TRACKING_ID);
+    // Send pageview with a custom path
+    ReactGA.send({
+      hitType: "pageview",
+      page: `/#/course-finder/details?courseId=${courseId}`,
+      title: courseName$._value,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,11 +127,8 @@ const Page = () => {
         // setCoursesCount(0);
       }
     };
-
-      // Send pageview with a custom path
-      ReactGA.send({ hitType: "pageview", page: `/#/course-finder/details?courseId=${courseId}`, title:courseName$._value });
     fetchData();
-  }, [courseId, setPageRequest]);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -378,11 +387,9 @@ const Course = () => {
   const [courseName, setCourseName] = useState(undefined);
 
   useEffect(() => {
-
     courseName$.subscribe(name => {
       setCourseName(name);
     })
-
   }, []);
 
   const breadCrumb = [

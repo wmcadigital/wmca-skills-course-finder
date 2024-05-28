@@ -6,11 +6,8 @@ import { RouterProvider, Navigate, createHashRouter} from "react-router-dom";
 import Courses from './pages/courses';
 import Course from './pages/course';
 import { openDB } from 'idb';
-import ReactGA from 'react-ga4';
-const TRACKING_ID = "G-PL6P8LRKHT";
-ReactGA.initialize(TRACKING_ID);
 
-console.log('v1.0.9');
+console.log('v1.0.10');
 
 openDB('coursesDB', 1, {
   upgrade(db) {
