@@ -89,12 +89,14 @@ const Page = () => {
 
   useEffect(() => {
     ReactGA.initialize(TRACKING_ID);
+    if(courseName$._value !== null) {
     // Send pageview with a custom path
     ReactGA.send({
       hitType: "pageview",
       page: `/#/course-finder/details?courseId=${courseId}`,
       title: courseName$._value,
     });
+  }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -174,7 +176,7 @@ const Page = () => {
     navigate(-1); // Navigate back one step
     ReactGA.event(
     {
-      category: 'Back to results',
+      category: 'Course finder Back to results link',
       action: 'click',
       label: e,
     })
@@ -336,9 +338,7 @@ const Page = () => {
                 getCourse?.CourseDescription && (
                   <>
                     <h2>Course description</h2>
-                    <p>
-                      <div dangerouslySetInnerHTML={{ __html: getCourse?.CourseDescription }}></div>
-                    </p>
+                    <p dangerouslySetInnerHTML={{ __html: getCourse?.CourseDescription }}></p>
                   </>
                 )
               }
