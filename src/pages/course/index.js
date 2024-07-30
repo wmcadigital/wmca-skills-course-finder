@@ -515,8 +515,7 @@ const Page = () => {
                   updateContactPhone(courseProvider)}
               </a>
             </p>
-            <p>This course is part of the Free Courses for Jobs offer and may be funded by the government for eligible adults. You need to live in Birmingham, Coventry, Dudley, Sandwell, Solihull, Walsall or Wolverhampton to qualify. 
-              <a  href="/#/course-finder/eligibility">Check if you are eligible</a>.
+            <p>This course is part of the <q>Free Courses for Jobs</q> offer and may be funded by the government for eligible adults. You need to live in Birmingham, Coventry, Dudley, Sandwell, Solihull, Walsall or Wolverhampton to qualify. <a href="/#/course-finder/eligibility">Check if you are eligible</a>.
             </p>
             {getCourse?.CourseURL && (
               <a
