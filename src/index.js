@@ -5,6 +5,9 @@ import reportWebVitals from './reportWebVitals';
 import { RouterProvider, Navigate, createHashRouter} from "react-router-dom";
 import Courses from './pages/courses';
 import Course from './pages/course';
+import Eligibility from './pages/eligibility';
+import EligibilityInside from './pages/eligibility/inside';
+import EligibilityOutside from './pages/eligibility/outside';
 import { openDB } from 'idb';
 
 console.log('v1.0.10');
@@ -38,6 +41,18 @@ const router = createHashRouter([
     path: "/course-finder/details",
     element: <Course />,
     // loader: ApiFetchCourseDetails,
+  },
+  {
+    path: "/course-finder/eligibility",
+    element: <Eligibility />,
+  },
+  {
+    path: "/course-finder/eligibility/inside",
+    element: <EligibilityInside />,
+  },
+  {
+    path: "/course-finder/eligibility/outside",
+    element: <EligibilityOutside />,
   },
 ]);
 

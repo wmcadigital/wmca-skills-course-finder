@@ -1,16 +1,25 @@
-import React, { useState, useEffect} from 'react';
-import AppLayout from '../../layout/index';
-import moment from 'moment';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { setCourseName$, courseName$ } from '../../services/rxjsStoreCourseName'
-import AccordionComponent from '../../components/accordion'
-import { openDB } from 'idb'
-import apiCourseProviderStorage from '../../services/apiCourseProviderStorage'
-import ReactGA from 'react-ga4';
+import React, { useState, useEffect } from "react";
+import AppLayout from "../../layout/index";
+import moment from "moment";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  setCourseName$,
+  courseName$,
+} from "../../services/rxjsStoreCourseName";
+import AccordionComponent from "../../components/accordion";
+import { openDB } from "idb";
+import apiCourseProviderStorage from "../../services/apiCourseProviderStorage";
+import ReactGA from "react-ga4";
 const TRACKING_ID = "G-PL6P8LRKHT";
 
-export const findCourse = (courseArray, startDate, durationValue, locationName, courseID) => {
-  return courseArray.find(course => {
+export const findCourse = (
+  courseArray,
+  startDate,
+  durationValue,
+  locationName,
+  courseID
+) => {
+  return courseArray.find((course) => {
     const normalizedStartDate = startDate === "null" ? null : startDate;
     return (
       course.StartDate === normalizedStartDate &&
@@ -19,20 +28,20 @@ export const findCourse = (courseArray, startDate, durationValue, locationName, 
       course.CourseID === courseID
     );
   });
-}
+};
 
 export const setupAccordionData = (course) => {
   // Use default values for properties if they are undefined
   const {
-    EntryRequirements = '',
-    LocationName = '',
-    LocationAddressOne = '',
-    LocationAddressTwo = '',
-    LocationCounty = '',
-    LocationPostcode = '',
-    LocationTelephone = '',
-    LocationTown = '',
-    LocationWebsite = ''
+    EntryRequirements = "",
+    LocationName = "",
+    LocationAddressOne = "",
+    LocationAddressTwo = "",
+    LocationCounty = "",
+    LocationPostcode = "",
+    LocationTelephone = "",
+    LocationTown = "",
+    LocationWebsite = "",
   } = course || {};
 
   // Create a new object with the extracted properties
@@ -46,20 +55,19 @@ export const setupAccordionData = (course) => {
       LocationPostcode,
       LocationTelephone,
       LocationTown,
-      LocationWebsite
-    }
+      LocationWebsite,
+    },
   };
 };
 
 const Page = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const newTab = queryParams.get('newTab');
+  const newTab = queryParams.get("newTab");
   const courseId = queryParams.get("courseId");
   const startDate = queryParams.get("startDate");
   const durationValue = queryParams.get("durationValue");
   const locationName = queryParams.get("locationName");
-
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
   const navigate = useNavigate();
@@ -72,55 +80,63 @@ const Page = () => {
   const setPageRequest = (coursesData, providersData) => {
     // Check if the data is an array
     if (Array.isArray(coursesData) && Array.isArray(providersData)) {
-      const course = findCourse(coursesData, startDate, durationValue, locationName, courseId)
-      const provider = providersData.filter(provider => provider?.UKPRN === course?.UKPRN)
+      const course = findCourse(
+        coursesData,
+        startDate,
+        durationValue,
+        locationName,
+        courseId
+      );
+      const provider = providersData.filter(
+        (provider) => provider?.UKPRN === course?.UKPRN
+      );
 
-      setCourseName$(course?.CourseName)
-      setGetCourse(course)
-      setCourseProvider(provider[0])
-      const accData = setupAccordionData(course)
-      setAccordionData(accData)
-      setLoading(false)
+      setCourseName$(course?.CourseName);
+      setGetCourse(course);
+      setCourseProvider(provider[0]);
+      const accData = setupAccordionData(course);
+      setAccordionData(accData);
+      setLoading(false);
     } else {
-      console.error('Invalid data format???????????');
+      console.error("Invalid data format???????????");
       // If the data format is invalid, use an empty array
     }
-  }
+  };
 
   useEffect(() => {
     ReactGA.initialize(TRACKING_ID);
-    if(courseName$._value !== null) {
-    // Send pageview with a custom path
-    ReactGA.send({
-      hitType: "pageview",
-      page: `/#/course-finder/details?courseId=${courseId}`,
-      title: courseName$._value,
-    });
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (courseName$._value !== null) {
+      // Send pageview with a custom path
+      ReactGA.send({
+        hitType: "pageview",
+        page: `/#/course-finder/details?courseId=${courseId}`,
+        title: courseName$._value,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const db = await openDB('coursesDB', 1);
+        const db = await openDB("coursesDB", 1);
         // Assuming 'courses' is the name of your object store
-        const result = await db.get('courses', 'courses');
-        const result2 = await db.get('providers', 'providers');
+        const result = await db.get("courses", "courses");
+        const result2 = await db.get("providers", "providers");
         db.close();
 
         const coursesData = JSON.parse(result);
         const providersData = JSON.parse(result2);
 
-        setPageRequest(coursesData, providersData)
+        setPageRequest(coursesData, providersData);
       } catch (error) {
         // When coming from permalink
         apiCourseProviderStorage()
-        .then((result) => {
-          setPageRequest(result.courses, result.providers)})
+          .then((result) => {
+            setPageRequest(result.courses, result.providers);
+          })
           .catch((error) => {
-            console.error('Error during data fetch:', error);
+            console.error("Error during data fetch:", error);
           });
         // console.error('Error:', error);
         // If there's an error during the data fetching process, use an empty array
@@ -130,6 +146,7 @@ const Page = () => {
       }
     };
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -137,15 +154,16 @@ const Page = () => {
       setIsMobile(window.innerWidth <= 767);
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []); // Empty dependency array ensures that this effect runs once
 
   useEffect(() => {
-    setHideBackToResultsBtn(typeof newTab === 'string')
+    setHideBackToResultsBtn(typeof newTab === "string");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array ensures the effect runs once after the initial render
 
   const loader = () => {
@@ -162,198 +180,277 @@ const Page = () => {
         </div>
       </div>
     );
-  }
-
-  const startDateFn = (courseDate) => {
-    if (courseDate === undefined) return '';
-    const date = moment(courseDate);
-    const formattedDate = date.format("MMMM Do YYYY");
-    return (courseDate === null ? 'Flexible' : formattedDate)
-  }
-
-  const handleGoBack = (e) => {
-    e.preventDefault()
-    navigate(-1); // Navigate back one step
-    ReactGA.event(
-    {
-      category: 'Course finder Back to results link',
-      action: 'click',
-      label: e,
-    })
   };
 
+  const startDateFn = (courseDate) => {
+    if (courseDate === undefined) return "";
+    const date = moment(courseDate);
+    const formattedDate = date.format("MMMM Do YYYY");
+    return courseDate === null ? "Flexible" : formattedDate;
+  };
+
+  const handleGoBack = (e) => {
+    e.preventDefault();
+    navigate(-1); // Navigate back one step
+    ReactGA.event({
+      category: "Course finder Back to results link",
+      action: "click",
+      label: e,
+    });
+  };
 
   const updateContactPhone = (courseProvider) => {
-    if (courseProvider?.ContactPhone && !courseProvider.ContactPhone.startsWith('0')) {
-      return '0' + courseProvider.ContactPhone
+    if (
+      courseProvider?.ContactPhone &&
+      !courseProvider.ContactPhone.startsWith("0")
+    ) {
+      return "0" + courseProvider.ContactPhone;
+    } else {
+      return courseProvider.ContactPhone;
     }
-    else {
-      return courseProvider.ContactPhone
-    }
-  }
+  };
 
   const handleProviderWebsiteClick = (providerWebsite) => {
-    ReactGA.event(
-    {
-      category: 'Course Provider Website link',
-      action: 'click',
+    ReactGA.event({
+      category: "Course Provider Website link",
+      action: "click",
       label: providerWebsite,
-    })
+    });
   };
 
   const handleProviderPhoneClick = (providerPhone) => {
-    ReactGA.event(
-    {
-      category: 'Course Provider Phone Number link',
-      action: 'click',
+    ReactGA.event({
+      category: "Course Provider Phone Number link",
+      action: "click",
       label: providerPhone,
-    })
+    });
   };
 
   const handleProviderEmailClick = (providerEmail) => {
-    ReactGA.event(
-    {
-      category: 'Course Provider Email link',
-      action: 'click',
+    ReactGA.event({
+      category: "Course Provider Email link",
+      action: "click",
       label: providerEmail,
-    })
+    });
   };
 
   const handleCourseURLClick = (courseWebsite) => {
-    ReactGA.event(
-    {
-      category: 'Course Website link',
-      action: 'click',
+    ReactGA.event({
+      category: "Course Website link",
+      action: "click",
       label: courseWebsite,
-    })
+    });
   };
 
-
   const handleLiveChatNCSClick = (liveChatNCS) => {
-    ReactGA.event(
-    {
-      category: 'National Careers Service Live Chat',
-      action: 'click',
+    ReactGA.event({
+      category: "National Careers Service Live Chat",
+      action: "click",
       label: liveChatNCS,
-    })
+    });
   };
 
   const handlePhoneNCSClick = (phoneNCS) => {
-    ReactGA.event(
-    {
-      category: 'National Careers Service Phone',
-      action: 'click',
+    ReactGA.event({
+      category: "National Careers Service Phone",
+      action: "click",
       label: phoneNCS,
-    })
+    });
   };
 
-  const providerDetails = (courseProvider) => {
-    return (
-      <div className="wmcads-content-card wmcads-m-b-lg">
-        <div className="wmcads-p-sm">
-          <h2>Find out more and apply</h2>
-          <p>Interested in this course? Get in touch with the training provider to find out more and apply.</p>
-          <p><strong>{courseProvider?.CourseProvider}</strong></p>
-          <p className="mtb-10"><strong>Website:</strong> 
-            <a onClick={() => handleProviderWebsiteClick(courseProvider.Website)} className="wmcads-link" href={courseProvider?.Website} target="_blank" rel="noopener noreferrer">
-              {courseProvider?.Website}
-            </a>
-          </p>
-          {courseProvider?.ContactEmail && <p className="mtb-10"><strong>Email:</strong>
-          <a onClick={() => handleProviderEmailClick(courseProvider.ContactEmail)} className="wmcads-link" href={`mailto:${courseProvider?.ContactEmail}`}>
-            {courseProvider?.ContactEmail}
-          </a>
-          </p>}
-          <p className="mtb-10"><strong>Phone:</strong> 
-            <a onClick={() => handleProviderPhoneClick(courseProvider.ContactPhone)} className="wmcads-link" href={`tel:${courseProvider?.ContactPhone && updateContactPhone(courseProvider)}`}>
-              {courseProvider?.ContactPhone && updateContactPhone(courseProvider)}
-            </a>
-          </p>
-          {getCourse?.CourseURL && <p className="mtb-10"><strong>Course Website:</strong> 
-          <a onClick={() => handleCourseURLClick(getCourse.CourseURL)} href={getCourse?.CourseURL} title="View the course on the course providors website" target="_blank" rel="noreferrer" className="wmcads-link"><span>Go to course</span>
-          </a>
-          </p>}
-        </div>
-      </div>
-    )
-  }
+  // const providerDetails = (courseProvider) => {
+  //   return (
+  //     <div className="wmcads-content-card wmcads-m-b-lg">
+  //       <div className="wmcads-p-sm">
+  //         <h2>Find out more and apply</h2>
+  //         <p>
+  //           Interested in this course? Get in touch with the training provider
+  //           to find out more and apply.
+  //         </p>
+  //         <p>
+  //           <strong>{courseProvider?.CourseProvider}</strong>
+  //         </p>
+  //         <p className="mtb-10">
+  //           <strong>Website:</strong>
+  //           <a
+  //             onClick={() => handleProviderWebsiteClick(courseProvider.Website)}
+  //             className="wmcads-link"
+  //             href={courseProvider?.Website}
+  //             target="_blank"
+  //             rel="noopener noreferrer"
+  //           >
+  //             {courseProvider?.Website}
+  //           </a>
+  //         </p>
+  //         {courseProvider?.ContactEmail && (
+  //           <p className="mtb-10">
+  //             <strong>Email:</strong>
+  //             <a
+  //               onClick={() =>
+  //                 handleProviderEmailClick(courseProvider.ContactEmail)
+  //               }
+  //               className="wmcads-link"
+  //               href={`mailto:${courseProvider?.ContactEmail}`}
+  //             >
+  //               {courseProvider?.ContactEmail}
+  //             </a>
+  //           </p>
+  //         )}
+  //         <p className="mtb-10">
+  //           <strong>Phone:</strong>
+  //           <a
+  //             onClick={() =>
+  //               handleProviderPhoneClick(courseProvider.ContactPhone)
+  //             }
+  //             className="wmcads-link"
+  //             href={`tel:${
+  //               courseProvider?.ContactPhone &&
+  //               updateContactPhone(courseProvider)
+  //             }`}
+  //           >
+  //             {courseProvider?.ContactPhone &&
+  //               updateContactPhone(courseProvider)}
+  //           </a>
+  //         </p>
+  //         {getCourse?.CourseURL && (
+  //           <p className="mtb-10">
+  //             <strong>Course Website:</strong>
+  //             <a
+  //               onClick={() => handleCourseURLClick(getCourse.CourseURL)}
+  //               href={getCourse?.CourseURL}
+  //               title="View the course on the course providors website"
+  //               target="_blank"
+  //               rel="noreferrer"
+  //               className="wmcads-link"
+  //             >
+  //               <span>Go to course</span>
+  //             </a>
+  //           </p>
+  //         )}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   const providerDetails2 = () => {
     return (
       <div className="wmcads-content-card wmcads-m-b-lg">
         <div className="wmcads-p-sm">
           <h2>Get help and advice</h2>
-          <p>Not sure which course is right for you? Our partners at National Careers Service are on hand to help</p>
-          <p className="mtb-10"><strong>Live chat:</strong> <a onClick={() => handleLiveChatNCSClick()} className="wmcads-link" href="https://nationalcareers.service.gov.uk/webchat/chat" target="_blank" rel="noopener noreferrer">Speak to an adviser on webchat</a></p>
-          <p className="mtb-10"><strong>Phone:</strong> <a onClick={() => handlePhoneNCSClick()} className="wmcads-link" href={`tel:0800100900`}>0800 100 900</a></p>
+          <p>
+            Not sure which course is right for you? Our partners at National
+            Careers Service are on hand to help
+          </p>
+          <p className="mtb-10">
+            <strong>Live chat:</strong>{" "}
+            <a
+              onClick={() => handleLiveChatNCSClick()}
+              className="wmcads-link"
+              href="https://nationalcareers.service.gov.uk/webchat/chat"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Speak to an adviser on webchat
+            </a>
+          </p>
+          <p className="mtb-10">
+            <strong>Phone:</strong>{" "}
+            <a
+              onClick={() => handlePhoneNCSClick()}
+              className="wmcads-link"
+              href={`tel:0800100900`}
+            >
+              0800 100 900
+            </a>
+          </p>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="course-details-page">
       {loading ? (
         <p>{loader()}</p>
       ) : (
-          <>
-            <div className="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none ">
-              <h1 id="wmcads-main-content">{getCourse?.CourseName}</h1>
-              {isMobile && providerDetails(courseProvider)}
-              <h2>Course details</h2>
-              <table className="wmcads-table wmcads-m-b-xl wmcads-table--without-header">
-                <tbody>
-                  <tr>
-                    <th scope="row" data-header="Header 1">Qualification name</th>
-                    <td data-header="Header 2">{getCourse?.CourseName}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" data-header="Header 1">Qualification level</th>
-                    <td data-header="Header 2">{getCourse?.NotionalNVQLevel}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" data-header="Header 1">Awarding organisation</th>
-                    <td data-header="Header 2">{getCourse?.AwardOrgName}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" data-header="Header 1">Course type</th>
-                    <td data-header="Header 2">{getCourse?.DeliverModeType}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" data-header="Header 1">Course hours</th>
-                    <td data-header="Header 2">{getCourse?.StudyModeType}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" data-header="Header 1">Course start date</th>
-                    <td data-header="Header 2">{startDateFn(getCourse?.StartDate)}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" data-header="Header 1">Costs</th>
-                    <td data-header="Header 2">{getCourse?.CostDescription}</td>
-                  </tr>
-                </tbody>
-              </table>
+        <>
+          <div className="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none ">
+            <h1 id="wmcads-main-content">{getCourse?.CourseName}</h1>
+            <h2>Course details</h2>
+            <table className="wmcads-table wmcads-m-b-xl wmcads-table--without-header">
+              <tbody>
+                <tr>
+                  <th scope="row" data-header="Header 1">
+                    Qualification name
+                  </th>
+                  <td data-header="Header 2">{getCourse?.CourseName}</td>
+                </tr>
+                <tr>
+                  <th scope="row" data-header="Header 1">
+                    Qualification level
+                  </th>
+                  <td data-header="Header 2">{getCourse?.NotionalNVQLevel}</td>
+                </tr>
+                <tr>
+                  <th scope="row" data-header="Header 1">
+                    Awarding organisation
+                  </th>
+                  <td data-header="Header 2">{getCourse?.AwardOrgName}</td>
+                </tr>
+                <tr>
+                  <th scope="row" data-header="Header 1">
+                    Course type
+                  </th>
+                  <td data-header="Header 2">{getCourse?.DeliverModeType}</td>
+                </tr>
+                <tr>
+                  <th scope="row" data-header="Header 1">
+                    Course hours
+                  </th>
+                  <td data-header="Header 2">{getCourse?.StudyModeType}</td>
+                </tr>
+                <tr>
+                  <th scope="row" data-header="Header 1">
+                    Course start date
+                  </th>
+                  <td data-header="Header 2">
+                    {startDateFn(getCourse?.StartDate)}
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row" data-header="Header 1">
+                    Costs
+                  </th>
+                  <td data-header="Header 2">{getCourse?.CostDescription}</td>
+                </tr>
+              </tbody>
+            </table>
 
-              {
-                getCourse?.CourseDescription && (
-                  <>
-                    <h2>Course description</h2>
-                    <p dangerouslySetInnerHTML={{ __html: getCourse?.CourseDescription }}></p>
-                  </>
-                )
-              }
+            {getCourse?.CourseDescription && (
+              <>
+                <h2>Course description</h2>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: getCourse?.CourseDescription,
+                  }}
+                ></p>
+              </>
+            )}
 
-              <div className="wmcads-accordion-wrapper">
-                <AccordionComponent data={{ title: 'Entry requirements', index: 1, isOpen: true }} ChildComponent={
+            <div className="wmcads-accordion-wrapper">
+              <AccordionComponent
+                data={{ title: "Entry requirements", index: 1, isOpen: true }}
+                ChildComponent={
                   <div className="wmcads-accordion__content">
-                    <p>
-                      {accordionData?.EntryRequirements}
-                    </p>
+                    <p>{accordionData?.EntryRequirements}</p>
                   </div>
-                } />
-                <AccordionComponent data={{ title: 'Location address', index: 1, isOpen: true }} ChildComponent={
+                }
+              />
+              <AccordionComponent
+                data={{ title: "Location address", index: 1, isOpen: true }}
+                ChildComponent={
                   <div className="wmcads-accordion__content">
-                    <div className="wmcads-inset-text" >
+                    <div className="wmcads-inset-text">
                       {accordionData?.LocationInfo?.LocationName}
                       <br />
                       {accordionData?.LocationInfo?.LocationAddressOne}
@@ -367,38 +464,116 @@ const Page = () => {
                       {accordionData?.LocationInfo?.LocationPostcode}
                     </div>
                   </div>
-                } />
-              </div>
-              {getCourse?.CourseURL && <a href={getCourse?.CourseURL} title="View the course on the course providors website" target="_blank" rel="noreferrer" className="wmcads-link"><span>Go to course</span></a>}
-              {!hideBackToResultsBtn && <><br /><br /><a href="/" onClick={handleGoBack} title="Go back to search results" target="_self" className="wmcads-link"><span>&lt; Back to results</span></a></>}
+                }
+              />
             </div>
-            <aside className="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
-              {!isMobile && providerDetails(courseProvider)}
-              {!isMobile && providerDetails2()}
-            </aside>
-          </>
+            <h2>Course provider</h2>
+            <h3 className="h4">
+              <strong>{courseProvider?.CourseProvider}</strong>
+            </h3>
+            <p className="mtb-10">
+              <strong>Website: </strong>
+              <a
+                onClick={() =>
+                  handleProviderWebsiteClick(courseProvider.Website)
+                }
+                className="wmcads-link"
+                href={courseProvider?.Website}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {courseProvider?.Website}
+              </a>
+            </p>
+            {courseProvider?.ContactEmail && (
+              <p className="mtb-10">
+                <strong>Email: </strong>
+                <a
+                  onClick={() =>
+                    handleProviderEmailClick(courseProvider.ContactEmail)
+                  }
+                  className="wmcads-link"
+                  href={`mailto:${courseProvider?.ContactEmail}`}
+                >
+                  {courseProvider?.ContactEmail}
+                </a>
+              </p>
+            )}
+            <p className="mtb-10">
+              <strong>Phone: </strong>
+              <a
+                onClick={() =>
+                  handleProviderPhoneClick(courseProvider.ContactPhone)
+                }
+                className="wmcads-link"
+                href={`tel:${
+                  courseProvider?.ContactPhone &&
+                  updateContactPhone(courseProvider)
+                }`}
+              >
+                {courseProvider?.ContactPhone &&
+                  updateContactPhone(courseProvider)}
+              </a>
+            </p>
+            <p>This course is part of the Free Courses for Jobs offer and may be funded by the government for eligible adults. You need to live in Birmingham, Coventry, Dudley, Sandwell, Solihull, Walsall or Wolverhampton to qualify. 
+              <a  href="/#/course-finder/eligibility">Check if you are eligible</a>.
+            </p>
+            {getCourse?.CourseURL && (
+              <a
+                href={getCourse?.CourseURL}
+                title="View the course on the course providors website"
+                target="_blank"
+                rel="noreferrer"
+                className="wmcads-btn wmcads-btn--primary"
+                onClick={() => handleCourseURLClick()}
+              >
+                Find out more about the course and apply
+                <svg className="wmcads-btn__icon wmcads-btn__icon--right">
+                  <use xlinkHref="#wmcads-general-chevron-right" href="#wmcads-general-chevron-right"></use>
+                </svg>
+              </a>
+            )}
+            {!hideBackToResultsBtn && (
+              <>
+                <br />
+                <br />
+                <a
+                  href="/"
+                  onClick={handleGoBack}
+                  title="Go back to search results"
+                  target="_self"
+                  className="wmcads-link"
+                >
+                  <span>&lt; Back to results</span>
+                </a>
+              </>
+            )}
+          </div>
+          <aside className="wmcads-col-1 wmcads-col-md-1-3 wmcads-m-b-lg">
+            {!isMobile && providerDetails2()}
+          </aside>
+        </>
       )}
     </div>
   );
 };
 
-
 const Course = () => {
   const [courseName, setCourseName] = useState(undefined);
 
   useEffect(() => {
-    courseName$.subscribe(name => {
+    courseName$.subscribe((name) => {
       setCourseName(name);
-    })
+    });
   }, []);
 
   const breadCrumb = [
     {
-      name: 'Course Finder',
-      path: '/course-finder',
+      name: "Course Finder",
+      path: "/course-finder",
     },
     {
-      name: courseName || '',
+      name: courseName || "",
     },
   ];
 
