@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { useEffect, useState } from "react";
 import ReactGA from "react-ga4";
 import AppLayout from "../../layout/index";
@@ -52,6 +53,7 @@ const sortCourses = (courses) => {
 };
 
 const filterCoursesByStartDate = (courses, startBy) => {
+  // eslint-disable-next-line array-callback-return
   return courses.filter((course) => {
     const targetDate = moment(course.StartDate);
     const currentDate = moment();
@@ -311,6 +313,7 @@ const Page = () => {
 
     setCourses(coursesFiltered);
     setCoursesCount(coursesFiltered.length);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, getCourses]);
 
   const newTabWindowLink = (course) => {
