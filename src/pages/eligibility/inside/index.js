@@ -1,6 +1,6 @@
 import React from "react";
 import AppLayout from "../../../layout/index";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
 
 export const findCourse = (
@@ -53,6 +53,9 @@ export const setupAccordionData = (course) => {
 
 const Page = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { state } = location;
+  const courseUrl = state?.courseUrl || null;
 
   const providerDetails2 = () => {
     return (
@@ -116,6 +119,14 @@ const Page = () => {
     });
   };
 
+  const handleCourseURLClick = (courseWebsite) => {
+    ReactGA.event({
+      category: "Course Website link from eligibility checker",
+      action: "click",
+      label: courseWebsite,
+    });
+  };
+
   return (
     <div className="course-details-page">
       <>
@@ -128,6 +139,21 @@ const Page = () => {
               This course is part of the Free Courses for Jobs offer and is
               funded by the government for eligible adults.
             </p>
+            {courseUrl && (
+              <a
+                href={courseUrl}
+                title="View the course on the course providors website"
+                target="_blank"
+                rel="noreferrer"
+                className="wmcads-btn wmcads-btn--primary"
+                onClick={() => handleCourseURLClick()}
+              >
+                Find out more about the course and apply
+                <svg className="wmcads-btn__icon wmcads-btn__icon--right">
+                  <use xlinkHref="#wmcads-general-chevron-right" href="#wmcads-general-chevron-right"></use>
+                </svg>
+              </a>
+            )}
           </div>
           <a
             href="/"

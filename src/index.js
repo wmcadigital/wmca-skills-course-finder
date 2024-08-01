@@ -10,7 +10,7 @@ import EligibilityInside from './pages/eligibility/inside';
 import EligibilityOutside from './pages/eligibility/outside';
 import { openDB } from 'idb';
 
-console.log('v1.0.10');
+console.log('v1.0.11');
 
 openDB('coursesDB', 1, {
   upgrade(db) {

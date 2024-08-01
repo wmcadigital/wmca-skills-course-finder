@@ -368,13 +368,17 @@ const Page = () => {
     );
   };
 
+  const handleClick = () => {
+    navigate('/course-finder/eligibility', { state: { courseUrl: getCourse?.CourseURL } });
+  };
+
   return (
     <div className="course-details-page">
       {loading ? (
         <p>{loader()}</p>
       ) : (
         <>
-          <div className="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none ">
+          <div className="main wmcads-col-1 wmcads-col-md-2-3 wmcads-m-b-xl wmcads-p-r-lg wmcads-p-r-sm-none">
             <h1 id="wmcads-main-content">{getCourse?.CourseName}</h1>
             <h2>Course details</h2>
             <table className="wmcads-table wmcads-m-b-xl wmcads-table--without-header">
@@ -515,7 +519,10 @@ const Page = () => {
                   updateContactPhone(courseProvider)}
               </a>
             </p>
-            <p>This course is part of the <q>Free Courses for Jobs</q> offer and may be funded by the government for eligible adults. You need to live in Birmingham, Coventry, Dudley, Sandwell, Solihull, Walsall or Wolverhampton to qualify. <a href="/#/course-finder/eligibility">Check if you are eligible</a>.
+            <h2>Funding: find out if you are eligible</h2>
+            <p>This course is part of the <q>Free Courses for Jobs</q> offer and may be funded by the government for eligible adults. 
+            You need to live in Birmingham, Coventry, Dudley, Sandwell, Solihull, Walsall or Wolverhampton to qualify. 
+            <button className="wmcads-btn wmcads-btn--link" onClick={handleClick}>Check if you are eligible</button>.
             </p>
             {getCourse?.CourseURL && (
               <a

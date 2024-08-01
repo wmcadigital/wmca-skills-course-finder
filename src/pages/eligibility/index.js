@@ -1,58 +1,13 @@
 import React, { useState } from "react";
 import AppLayout from "../../layout/index";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
-
-export const findCourse = (
-  courseArray,
-  startDate,
-  durationValue,
-  locationName,
-  courseID
-) => {
-  return courseArray.find((course) => {
-    const normalizedStartDate = startDate === "null" ? null : startDate;
-    return (
-      course.StartDate === normalizedStartDate &&
-      course.DurationValue === durationValue &&
-      course.LocationName === locationName &&
-      course.CourseID === courseID
-    );
-  });
-};
-
-export const setupAccordionData = (course) => {
-  // Use default values for properties if they are undefined
-  const {
-    EntryRequirements = "",
-    LocationName = "",
-    LocationAddressOne = "",
-    LocationAddressTwo = "",
-    LocationCounty = "",
-    LocationPostcode = "",
-    LocationTelephone = "",
-    LocationTown = "",
-    LocationWebsite = "",
-  } = course || {};
-
-  // Create a new object with the extracted properties
-  return {
-    EntryRequirements,
-    LocationInfo: {
-      LocationName,
-      LocationAddressOne,
-      LocationAddressTwo,
-      LocationCounty,
-      LocationPostcode,
-      LocationTelephone,
-      LocationTown,
-      LocationWebsite,
-    },
-  };
-};
 
 const Page = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { state } = location;
+  const courseUrl = state?.courseUrl || '';
 
   const providerDetails2 = () => {
     return (
@@ -144,8 +99,6 @@ const Page = () => {
     const formattedPostcode = formatPostcode(postcode);
     if (isValid) {
     setIsDisabled(false);
-    console.log('Valid postcode:', postcode);
-    console.log(formattedPostcode);
     setLoad(true);
     try {
       let res = await fetch(
@@ -158,7 +111,7 @@ const Page = () => {
       if (res.status === 200) {
         if (resJson.Table1[0]?.Column1 === "TRUE") {
           setMessage("Yes - Eligible");
-          navigate('/course-finder/eligibility/inside');
+          navigate('/course-finder/eligibility/inside', { state: { courseUrl: courseUrl} });
         } else {
           setMessage("No - Not Eligible");
           navigate('/course-finder/eligibility/outside');
@@ -191,8 +144,7 @@ const Page = () => {
               <h1 className="h4">Eligibility Checker</h1>
               <h2>Are you eligible?</h2>
               <p>
-                Check if you live in an eligible area then click continue to
-                apply.
+              Enter your postcode below to find out if you are eligible for funding for this course. You need to live in Birmingham, Coventry, Dudley, Sandwell, Solihull, Walsall or Wolverhampton to qualify.
               </p>
               <form onSubmit={handleSubmit}>
                 <div className={postcodeClass}>
