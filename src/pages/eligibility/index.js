@@ -102,7 +102,7 @@ const Page = () => {
     setLoad(true);
     try {
       let res = await fetch(
-        `https://prod-31.uksouth.logic.azure.com/workflows/f96c772c034c41589e4a46ade3fd9268/triggers/manual/paths/invoke/postcode/is_eligible?search_text=${formattedPostcode}&api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=kQyD7-s8Mly_G3KpbYrXZ1yGU7arRIlR0CY8Rapj4U0`,
+        `https://prod-31.uksouth.logic.azure.com/workflows/0f5394c3f8844570a94202527b41f1b7/triggers/manual/paths/invoke/postcode/is_eligible?search_text=${formattedPostcode}&api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZVkZT_5x_6kpE0Rc4RyfbkYWpO1MnYAJB6KdqoVZzUM`,
         {
           method: "GET",
         }
@@ -117,7 +117,7 @@ const Page = () => {
           navigate('/course-finder/eligibility/outside');
         }
       } else {
-        setMessage("No");
+        setMessage("Issue checking. Please try again later.");
       }
     } catch (err) {
       console.log(err);
